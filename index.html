@@ -135,13 +135,13 @@
       if (results.landmarks) {
           for (const landmarks of results.landmarks) {
               drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
-                  color: "#00BFFF",
+                  color: "#FFFFFF",
                   lineWidth: 5
               });
-              drawLandmarks(canvasCtx, landmarks, { color: "#FFFFFF", lineWidth: 2 });
+              drawLandmarks(canvasCtx, landmarks, { color: "#00BFFF", lineWidth: 2 });
           }
       }
-
+      
       canvasCtx.restore();
       // Call this function again to keep predicting when the browser is ready.
       if (webcamRunning === true) {
