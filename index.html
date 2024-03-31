@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hand Tracking with MediaPipe</title>
+    <script type="module">
+        import { Hands } from '@mediapipe/hands';
+
+        const videoElement = document.getElementById('video');
+        const canvasElement = document.getElementById('canvas');
+        const context = canvasElement.getContext('2d');
+
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ 'video': true });
+            videoElement.srcObject = stream;
+
+            return new Promise((resolve) => {
+                videoElement.onloadedmetadata = () => {
+                    resolve(videoElement);
+                };
+            });
+        }
+
+        async function detectHands(video) {
+            const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+            hands.setOptions({
+                maxNumHands: 1,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5,
+            });
+            hands.onResults(handleHandResults);
+
+            const videoElement = video;
+            videoElement.addEventListener('loadeddata', () => {
+                hands.send({ image: videoElement });
+            });
+        }
+
+        function handleHandResults(results) {
+            context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            if (results.multiHandLandmarks) {
+                for (const landmarks of results.multiHandLandmarks) {
+                    for (const point of landmarks) {
+                        const x = point.x * canvasElement.width;
+                        const y = point.y * canvasElement.height;
+                        context.beginPath();
+                        context.arc(x, y, 5, 0, 2 * Math.PI);
+                        context.fillStyle = 'red';
+                        context.fill();
+                    }
+                }
+            }
+        }
+
+        async function main() {
+            await setupCamera();
+            detectHands(videoElement);
+        }
+
+        main();
+    </script>
+</head>
+<body>
+    <video id="video" autoplay playsinline style="display: none;"></video>
+    <canvas id="canvas"></canvas>
+</body>
+</html>
