@@ -118,6 +118,7 @@
       if (lastVideoTime !== video.currentTime) {
           lastVideoTime = video.currentTime;
           results = handLandmarker.detectForVideo(video, startTimeMs);
+          console.log(video);
       }
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
