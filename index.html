@@ -137,6 +137,18 @@
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
+        // Отрисовываем лэндмарки
+        if (results.landmarks) {
+          for (const landmarks of results.landmarks) {
+              drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+                  color: "#FFFFFF",
+                  lineWidth: 5
+              });
+              drawLandmarks(canvasCtx, landmarks, { color: "#00BFFF", lineWidth: 2 });
+          }
+      }
+      
+        // Формируем результаты для вывода
         if (results.landmarks) {
             const formattedResults = {
                 handedness: results.landmarks.map(hand => ({
