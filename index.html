@@ -51,6 +51,7 @@
     // Before we can use HandLandmarker class we must wait for it to finish
     // loading. Machine Learning models can be large and take a moment to
     // get everything needed to run.
+    console.log('start program')
     const createHandLandmarker = async () => {
         const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
         handLandmarker = await HandLandmarker.createFromOptions(vision, {
@@ -132,6 +133,7 @@
             lastVideoTime = video.currentTime;
             results = handLandmarker.detectForVideo(video, startTimeMs);
             //console.log(video);
+            console.log('results: ', results);  
         }
 
         canvasCtx.save();
@@ -140,6 +142,7 @@
         // Отрисовываем лэндмарки
         if (results.landmarks) {
           for (const landmarks of results.landmarks) {
+
               drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
                   color: "#FFFFFF",
                   lineWidth: 5
@@ -149,38 +152,38 @@
       }
 
         // Формируем результаты для вывода
-        if (results.landmarks) {
-            const formattedResults = {
-                landmarks: results.landmarks.map(hand => ({
-                    landmarks: hand.Landmarks.map(landmark => ({
-                        x: landmark.x,
-                        y: landmark.y,
-                        z: landmark.z
-                    }))
-                }))
-            };
+        // if (results.landmarks) {
+        //     const formattedResults = {
+        //         landmarks: results.landmarks.map(hand => ({
+        //             landmarks: hand.Landmarks.map(landmark => ({
+        //                 x: landmark.x,
+        //                 y: landmark.y,
+        //                 z: landmark.z
+        //             }))
+        //         }))
+        //     };
 
-            console.log(formattedResults);
-            // Выводим landmarks в HTML
-            /*landmarksOutput.innerHTML = `
-                <h2>Landmarks:</h2>
-                ${formattedResults.landmarks.map(hand => `
-                    <div class="hand">
-                        <h3>Landmarks:</h3>
-                        <ul>
-                            ${hand.landmarks.map(landmark => `
-                                <li>
-                                    x: ${landmark.x}<br>
-                                    y: ${landmark.y}<br>
-                                    z: ${landmark.z}<br>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                `).join('')}
-            `;*/
-            //alert(formattedResults);
-        }
+        //     // console.log('formattedResults: ', formattedResults);
+        //     // Выводим landmarks в HTML
+        //     /*landmarksOutput.innerHTML = `
+        //         <h2>Landmarks:</h2>
+        //         ${formattedResults.landmarks.map(hand => `
+        //             <div class="hand">
+        //                 <h3>Landmarks:</h3>
+        //                 <ul>
+        //                     ${hand.landmarks.map(landmark => `
+        //                         <li>
+        //                             x: ${landmark.x}<br>
+        //                             y: ${landmark.y}<br>
+        //                             z: ${landmark.z}<br>
+        //                         </li>
+        //                     `).join('')}
+        //                 </ul>
+        //             </div>
+        //         `).join('')}
+        //     `;*/
+        //     //alert(formattedResults);
+        // }
         
         canvasCtx.restore();
         // Call this function again to keep predicting when the browser is ready.
