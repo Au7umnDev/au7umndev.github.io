@@ -147,17 +147,10 @@
               drawLandmarks(canvasCtx, landmarks, { color: "#00BFFF", lineWidth: 2 });
           }
       }
-      
+
         // Формируем результаты для вывода
         if (results.landmarks) {
             const formattedResults = {
-                handedness: results.landmarks.map(hand => ({
-                    categories: [{
-                        index: 0,
-                        score: 0.98396,
-                        categoryName: hand.Handedness.Categories[0].categoryName
-                    }]
-                })),
                 landmarks: results.landmarks.map(hand => ({
                     landmarks: hand.Landmarks.map(landmark => ({
                         x: landmark.x,
@@ -172,9 +165,6 @@
                 <h2>Landmarks:</h2>
                 ${formattedResults.landmarks.map(hand => `
                     <div class="hand">
-                        <h3>Handedness:</h3>
-                        <p>Category: ${hand.Handedness.Categories[0].categoryName}</p>
-                        <p>Score: ${hand.Handedness.Categories[0].score}</p>
                         <h3>Landmarks:</h3>
                         <ul>
                             ${hand.landmarks.map(landmark => `
