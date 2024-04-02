@@ -111,19 +111,19 @@
         if (webcamRunning === true) {
             webcamRunning = false;
             enableWebcamButton.innerText = "ENABLE PREDICTIONS";
-            // Отображаем элемент с id try_on
+            // Скрываем элемент с id try_on
             const tryOnDiv = document.getElementById("try_on");
             if (tryOnDiv) {
-                tryOnDiv.style.display = "block";
+                tryOnDiv.style.display = "none";
             }
         }
         else {
             webcamRunning = true;
             enableWebcamButton.innerText = "DISABLE PREDICTIONS";
-            // Скрываем элемент с id try_on
+            // Отображаем элемент с id try_on
             const tryOnDiv = document.getElementById("try_on");
             if (tryOnDiv) {
-                tryOnDiv.style.display = "none";
+                tryOnDiv.style.display = "block";
             }
 
             // getUsermedia parameters.
@@ -140,6 +140,7 @@
             });
         }
     }
+
 
     let lastVideoTime = -1;
     let results = undefined;
