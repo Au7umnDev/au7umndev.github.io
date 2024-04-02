@@ -47,6 +47,7 @@
     let runningMode = "VIDEO";
     let enableWebcamButton;
     let webcamRunning = false;
+    let lastVideoTime = -1; // Объявляем переменную lastVideoTime
 
     // Before we can use HandLandmarker class we must wait for it to finish
     // loading. Machine Learning models can be large and take a moment to
@@ -124,11 +125,10 @@
             await handLandmarker.setOptions({ runningMode: "VIDEO" });
         }
 
-        let startTimeMs = performance.now();
         const currentTime = video.currentTime;
         if (currentTime !== lastVideoTime) {
             lastVideoTime = currentTime;
-            results = handLandmarker.detectForVideo(video, startTimeMs);
+            results = handLandmarker.detectForVideo(video, performance.now());
             console.log('results: ', results);  
         }
 
@@ -153,6 +153,7 @@
         }
     }
 </script>
+
 
   
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm/vision_wasm_internal.js" crossorigin="anonymous"></script>
