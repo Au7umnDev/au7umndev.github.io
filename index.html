@@ -115,6 +115,12 @@
 
     // Detect landmarks in webcam video
     async function predictWebcam() {
+        // Проверяем, что handLandmarker создан
+        if (!handLandmarker) {
+            console.log("Wait! HandLandmarker not loaded yet.");
+            return;
+        }
+
         canvasElement.style.width = video.videoWidth;
         canvasElement.style.height = video.videoHeight;
         canvasElement.width = video.videoWidth;
@@ -154,6 +160,7 @@
         }
     }
 </script>
+
 
 
 
