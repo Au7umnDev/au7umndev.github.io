@@ -21,7 +21,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
   
 <section id="demos" class="">
-    <h1>Demo: v4 Webcam continuous hands landmarks detection</h1>
+    <h1>Demo: v5 Webcam continuous hands landmarks detection</h1>
     <p>Hold your hand in front of your webcam to get real-time hand landmarker detection.<br>Click <b>enable webcam</b> below and grant access to the webcam if prompted.</p>
 
     <div id="liveView" class="videoView">
@@ -29,7 +29,7 @@
             <span class="mdc-button__ripple"></span>
             <span class="mdc-button__label">ENABLE WEBCAM</span>
         </button>
-        <div style="position: relative;">
+        <div id="try_on" style="position: relative;">
             <video id="webcam" style="position: abso" autoplay="" playsinline=""></video>
             <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
         </div>
@@ -89,6 +89,25 @@
             console.log("Wait! objectDetector not loaded yet.");
             return;
         }
+
+        if (enableWebcamButton.innerText === "DISABLE PREDICTIONS") {
+            // Отключаем вывод видео
+            video.srcObject = null;
+            // Удаляем слушателя события loadeddata
+            video.removeEventListener("loadeddata", predictWebcam);
+            // Скрываем элемент с id try_on
+            const tryOnDiv = document.getElementById("try_on");
+            if (tryOnDiv) {
+                tryOnDiv.style.display = "none";
+            }
+
+            // Меняем текст кнопки
+            enableWebcamButton.innerText = "ENABLE PREDICTIONS";
+            // Устанавливаем webcamRunning в false
+            webcamRunning = false;
+            return;
+        }
+
         if (webcamRunning === true) {
             webcamRunning = false;
             enableWebcamButton.innerText = "ENABLE PREDICTIONS";
