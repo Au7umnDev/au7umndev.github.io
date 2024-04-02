@@ -19,6 +19,7 @@
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
   
 <section id="demos" class="">
     <h1>Demo: v5 Webcam continuous hands landmarks detection</h1>
@@ -32,6 +33,7 @@
         <div id="try_on" style="position: relative;">
             <video id="webcam" style="position: abso" autoplay="" playsinline=""></video>
             <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
+            <div id="overlay"></div>
         </div>
     </div>
 
@@ -49,6 +51,7 @@
     let webcamRunning = false;
     let lastVideoTime = -1;
     let results = undefined; // Объявляем переменную results
+    let cubeAdded = false;
 
     // Before we can use HandLandmarker class we must wait for it to finish
     // loading. Machine Learning models can be large and take a moment to
@@ -142,7 +145,7 @@
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-        // Отрисовываем лэндмарки
+        // Отрисовываем лэндмарки, создаем куб, позиционируем его относительно лэндмарки
         if (results && results.landmarks) {
             for (const landmarks of results.landmarks) {
                 drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
@@ -150,6 +153,11 @@
                     lineWidth: 5
                 });
                 drawLandmarks(canvasCtx, landmarks, { color: "#00BFFF", lineWidth: 2 });
+            }
+            if(!cubeAdded && results.landmarks.length !== 0) {
+                console.log('added cube');
+                addCube();
+                cubeAdded = true;
             }
         }
 
@@ -160,10 +168,41 @@
         }
     }
 
+    // Функция для добавления куба на сцену
+    function addCube() {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, canvasElement.width / canvasElement.height, 0.1, 1000);
+        camera.position.z = 5;
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(canvasElement.width, canvasElement.height);
+        renderer.domElement.style.position = "absolute";
+        renderer.domElement.style.top = "0";
+        renderer.domElement.style.left = "0";
+        document.getElementById("overlay").appendChild(renderer.domElement);
+
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0xFFA500, wireframe: true });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+    }
+
+    // Функция для удаления куба со сцены
+    function removeCube() {
+        const overlay = document.getElementById("overlay");
+        while (overlay.firstChild) {
+            overlay.removeChild(overlay.firstChild);
+        }
+    }
+
 </script>
-
-
-
 
   
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm/vision_wasm_internal.js" crossorigin="anonymous"></script>
