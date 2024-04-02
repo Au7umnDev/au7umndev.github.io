@@ -77,74 +77,41 @@
     // wants to activate it.
     if (hasGetUserMedia()) {
         enableWebcamButton = document.getElementById("webcamButton");
-        enableWebcamButton.addEventListener("click", enableCam);
+        enableWebcamButton.addEventListener("click", toggleWebcam);
     }
     else {
         console.warn("getUserMedia() is not supported by your browser");
     }
 
-    // Enable the live webcam view and start detection.
-    function enableCam(event) {
-        if (!handLandmarker) {
-            console.log("Wait! objectDetector not loaded yet.");
-            return;
-        }
-
-        if (enableWebcamButton.innerText === "DISABLE PREDICTIONS") {
-            // Отключаем вывод видео
+    // Toggle webcam and processing
+    function toggleWebcam() {
+        if (webcamRunning) {
+            // Stop webcam and processing
             video.srcObject = null;
-            // Удаляем слушателя события loadeddata
             video.removeEventListener("loadeddata", predictWebcam);
-            // Скрываем элемент с id try_on
-            const tryOnDiv = document.getElementById("try_on");
-            if (tryOnDiv) {
-                tryOnDiv.style.display = "none";
-            }
-
-            // Меняем текст кнопки
-            enableWebcamButton.innerText = "ENABLE PREDICTIONS";
-            // Устанавливаем webcamRunning в false
+            document.getElementById("try_on").style.display = "none";
+            enableWebcamButton.innerText = "ENABLE WEBCAM";
             webcamRunning = false;
-            return;
-        }
-
-        if (webcamRunning === true) {
-            webcamRunning = false;
-            enableWebcamButton.innerText = "ENABLE PREDICTIONS";
-            // Скрываем элемент с id try_on
-            const tryOnDiv = document.getElementById("try_on");
-            if (tryOnDiv) {
-                tryOnDiv.style.display = "none";
-            }
-        }
-        else {
-            webcamRunning = true;
-            enableWebcamButton.innerText = "DISABLE PREDICTIONS";
-            // Отображаем элемент с id try_on
-            const tryOnDiv = document.getElementById("try_on");
-            if (tryOnDiv) {
-                tryOnDiv.style.display = "block";
-            }
-
-            // getUsermedia parameters.
+        } else {
+            // Start webcam and processing
             const constraints = {
                 video: {
                     facingMode: 'environment' // Use back camera
                 }
             };
-
-            // Activate the webcam stream.
             navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
                 video.srcObject = stream;
                 video.addEventListener("loadeddata", predictWebcam);
+                document.getElementById("try_on").style.display = "block";
+                enableWebcamButton.innerText = "DISABLE WEBCAM";
+                webcamRunning = true;
+            }).catch((error) => {
+                console.error("Error accessing webcam:", error);
             });
         }
     }
 
-
-    let lastVideoTime = -1;
-    let results = undefined;
-
+    // Detect landmarks in webcam video
     async function predictWebcam() {
         canvasElement.style.width = video.videoWidth;
         canvasElement.style.height = video.videoHeight;
@@ -158,10 +125,10 @@
         }
 
         let startTimeMs = performance.now();
-        if (lastVideoTime !== video.currentTime) {
-            lastVideoTime = video.currentTime;
+        const currentTime = video.currentTime;
+        if (currentTime !== lastVideoTime) {
+            lastVideoTime = currentTime;
             results = handLandmarker.detectForVideo(video, startTimeMs);
-            //console.log(video);
             console.log('results: ', results);  
         }
 
@@ -169,58 +136,24 @@
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
         // Отрисовываем лэндмарки
-        if (results.landmarks) {
-          for (const landmarks of results.landmarks) {
+        if (results && results.landmarks) {
+            for (const landmarks of results.landmarks) {
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+                    color: "#FFFFFF",
+                    lineWidth: 5
+                });
+                drawLandmarks(canvasCtx, landmarks, { color: "#00BFFF", lineWidth: 2 });
+            }
+        }
 
-              drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
-                  color: "#FFFFFF",
-                  lineWidth: 5
-              });
-              drawLandmarks(canvasCtx, landmarks, { color: "#00BFFF", lineWidth: 2 });
-          }
-      }
-
-        // Формируем результаты для вывода
-        // if (results.landmarks) {
-        //     const formattedResults = {
-        //         landmarks: results.landmarks.map(hand => ({
-        //             landmarks: hand.Landmarks.map(landmark => ({
-        //                 x: landmark.x,
-        //                 y: landmark.y,
-        //                 z: landmark.z
-        //             }))
-        //         }))
-        //     };
-
-        //     // console.log('formattedResults: ', formattedResults);
-        //     // Выводим landmarks в HTML
-        //     /*landmarksOutput.innerHTML = `
-        //         <h2>Landmarks:</h2>
-        //         ${formattedResults.landmarks.map(hand => `
-        //             <div class="hand">
-        //                 <h3>Landmarks:</h3>
-        //                 <ul>
-        //                     ${hand.landmarks.map(landmark => `
-        //                         <li>
-        //                             x: ${landmark.x}<br>
-        //                             y: ${landmark.y}<br>
-        //                             z: ${landmark.z}<br>
-        //                         </li>
-        //                     `).join('')}
-        //                 </ul>
-        //             </div>
-        //         `).join('')}
-        //     `;*/
-        //     //alert(formattedResults);
-        // }
-        
         canvasCtx.restore();
         // Call this function again to keep predicting when the browser is ready.
-        if (webcamRunning === true) {
+        if (webcamRunning) {
             window.requestAnimationFrame(predictWebcam);
         }
     }
 </script>
+
   
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm/vision_wasm_internal.js" crossorigin="anonymous"></script>
 </body>
