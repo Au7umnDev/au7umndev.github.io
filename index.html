@@ -47,7 +47,8 @@
     let runningMode = "VIDEO";
     let enableWebcamButton;
     let webcamRunning = false;
-    let lastVideoTime = -1; // Объявляем переменную lastVideoTime
+    let lastVideoTime = -1;
+    let results = undefined; // Объявляем переменную results
 
     // Before we can use HandLandmarker class we must wait for it to finish
     // loading. Machine Learning models can be large and take a moment to
@@ -153,6 +154,7 @@
         }
     }
 </script>
+
 
 
   
