@@ -116,8 +116,8 @@
     // Detect landmarks in webcam video
     async function predictWebcam() {
         // Проверяем, что handLandmarker создан
-        if (!handLandmarker) {
-            console.log("Wait! HandLandmarker not loaded yet.");
+        if (!handLandmarker || !webcamRunning) {
+            console.log("HandLandmarker is not loaded or webcam is not running.");
             return;
         }
 
@@ -159,6 +159,7 @@
             window.requestAnimationFrame(predictWebcam);
         }
     }
+
 </script>
 
 
