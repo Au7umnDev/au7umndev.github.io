@@ -52,6 +52,8 @@
     let lastVideoTime = -1;
     let results = undefined; // Объявляем переменную results
     let cubeAdded = false;
+    let cube = undefined;
+    let position = new Object;
 
     // Before we can use HandLandmarker class we must wait for it to finish
     // loading. Machine Learning models can be large and take a moment to
@@ -94,7 +96,6 @@
             // Stop webcam and processing
             video.srcObject = null;
             video.removeEventListener("loadeddata", predictWebcam);
-            document.getElementById("try_on").style.display = "none";
             enableWebcamButton.innerText = "ENABLE WEBCAM";
             webcamRunning = false;
         } else {
@@ -155,9 +156,19 @@
                 drawLandmarks(canvasCtx, landmarks, { color: "#00BFFF", lineWidth: 2 });
             }
             if(!cubeAdded && results.landmarks.length !== 0) {
-                console.log('added cube');
                 addCube();
                 cubeAdded = true;
+            }
+            else if (cubeAdded && results.landmarks.length !== 0) {
+                console.log('adjusting cube');
+                position.x = results.landmarks[0][14].x;
+                position.y = -results.landmarks[0][14].y;
+                position.z = -results.landmarks[0][14].z;
+                cube.position.copy(position);
+                cube.visible = true; // Показываем куб
+            }
+            else if (cubeAdded && results.landmarks.length == 0) {
+                cube.visible = false; // Скрываем куб
             }
         }
 
@@ -172,7 +183,7 @@
     function addCube() {
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, canvasElement.width / canvasElement.height, 0.1, 1000);
-        camera.position.z = 5;
+        camera.position.z = 2;
         const renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(canvasElement.width, canvasElement.height);
         renderer.domElement.style.position = "absolute";
@@ -182,24 +193,19 @@
 
         const geometry = new THREE.BoxGeometry();
         const material = new THREE.MeshBasicMaterial({ color: 0xFFA500, wireframe: true });
-        const cube = new THREE.Mesh(geometry, material);
+        cube = new THREE.Mesh(geometry, material);
+        cube.scale.set(0.3, 0.3, 0.3);
         scene.add(cube);
 
         function animate() {
             requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
+            if (cube) {
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+            }
             renderer.render(scene, camera);
         }
         animate();
-    }
-
-    // Функция для удаления куба со сцены
-    function removeCube() {
-        const overlay = document.getElementById("overlay");
-        while (overlay.firstChild) {
-            overlay.removeChild(overlay.firstChild);
-        }
     }
 
 </script>
