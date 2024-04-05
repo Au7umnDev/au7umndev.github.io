@@ -192,7 +192,8 @@
         renderer.domElement.style.top = "0";
         renderer.domElement.style.left = "0";
         document.getElementById("overlay").appendChild(renderer.domElement);
-
+        console.log('ass');
+        
         const loader = new THREE.GLTFLoader();
         loader.load(
             '/app/models/scene.gltf',
