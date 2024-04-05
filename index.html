@@ -211,7 +211,22 @@
         loader.load(
             'app/models/simple_ring.glb',
             function (gltf) {
-                model.add(gltf.scene);
+                gltf.scene.traverse(function (child) {
+                    if (child.isMesh) {
+                        let m = child;
+                        m.receiveShadow = true;
+                        m.castShadow = true;
+                    }
+                    if (child.isLight) {
+                        let l = child;
+                        l.castShadow = true;
+                        l.shadow.bias = -0.003;
+                        l.shadow.mapSize.width = 2048;
+                        l.shadow.mapSize.height = 2048;
+                    }
+                })
+
+                model = gltf.scene;
                 model.scale.set(0.3, 0.3, 0.3);
                 scene.add(model);
             },
