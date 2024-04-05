@@ -203,13 +203,14 @@
         renderer.domElement.style.left = "0";
         document.getElementById("overlay").appendChild(renderer.domElement);
 
+        const ring = new THREE.Object3D( );
         const loader = new GLTFLoader();
         loader.load(
             'app/models/scene.gltf',
             function (gltf) {
-                model = gltf.scene;
-                model.scale.set(0.3, 0.3, 0.3);
-                scene.add(model);
+                ring.add(gltf.scene);
+                ring.scale.set(0.3, 0.3, 0.3);
+                scene.add(ring);
             },
             undefined,
             function (error) {
