@@ -31,7 +31,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.min.js"></script>
   
 <section id="demos" class="">
-    <h1>Demo: v7 Webcam continuous hands landmarks detection</h1>
+    <h1>Demo: v8 Webcam continuous hands landmarks detection</h1>
     <p>Hold your hand in front of your webcam to get real-time hand landmarker detection.<br>Click <b>enable webcam</b> below and grant access to the webcam if prompted.</p>
 
     <div id="liveView" class="videoView">
@@ -218,7 +218,15 @@
             }
         );
 
-        renderer.render(scene, camera);
+        function animate() {
+            requestAnimationFrame(animate);
+            if (model) {
+                model.rotation.x += 0.01;
+                model.rotation.y += 0.01;
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
     }
 
 </script>
