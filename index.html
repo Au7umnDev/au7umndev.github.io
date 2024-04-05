@@ -29,7 +29,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/loaders/GLTFLoader.js"></script>
   
 <section id="demos" class="">
     <h1>Demo: v6 Webcam continuous hands landmarks detection</h1>
@@ -52,7 +51,7 @@
 
 <script id="rendered-js" type="module">
     import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
-    //import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     import * as THREE from 'three';
     const demosSection = document.getElementById("demos");
     const landmarksOutput = document.getElementById("landmarksOutput"); // Получаем div для вывода landmarks
