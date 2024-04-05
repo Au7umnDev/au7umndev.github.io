@@ -19,7 +19,7 @@
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.min.js"></script>
   
 <section id="demos" class="">
     <h1>Demo: v7 Webcam continuous hands landmarks detection</h1>
@@ -192,6 +192,7 @@
         renderer.domElement.style.top = "0";
         renderer.domElement.style.left = "0";
         document.getElementById("overlay").appendChild(renderer.domElement);
+        console.log('ass');
         
         const loader = new THREE.GLTFLoader();
         loader.load(
