@@ -202,7 +202,8 @@
         renderer.domElement.style.top = "0";
         renderer.domElement.style.left = "0";
         renderer.physicallyCorrectLights = true;
-
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        
         document.getElementById("overlay").appendChild(renderer.domElement);
 
         const ambientLight = new THREE.AmbientLight(0xFFFFFF);
