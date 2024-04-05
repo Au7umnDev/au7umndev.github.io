@@ -214,6 +214,15 @@
             'app/models/simple_ring.glb',
             function (gltf) {
                 model = gltf.scene;
+                model.traverse((object) => {
+                    if (object.isMesh) {
+                    const map = object.material && object.material.map ? object.material.map : null
+                    const material = new THREE.MeshStandardMaterial;
+                    material.map = map
+                    object.material = material;
+                    }
+                });
+                
                 model.scale.set(0.3, 0.3, 0.3);
                 scene.add(model);
             },
