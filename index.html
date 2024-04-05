@@ -22,7 +22,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
   
 <section id="demos" class="">
-    <h1>Demo: v6 Webcam continuous hands landmarks detection</h1>
+    <h1>Demo: v7 Webcam continuous hands landmarks detection</h1>
     <p>Hold your hand in front of your webcam to get real-time hand landmarker detection.<br>Click <b>enable webcam</b> below and grant access to the webcam if prompted.</p>
 
     <div id="liveView" class="videoView">
@@ -42,7 +42,7 @@
 
 <script id="rendered-js" type="module">
     import { HandLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
-    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.132.2/examples/jsm/loaders/GLTFLoader.js';
+    import { GLTFLoader } from '/node_modules/three/addons/loaders/GLTFLoader.js';
     const demosSection = document.getElementById("demos");
     const landmarksOutput = document.getElementById("landmarksOutput"); // Получаем div для вывода landmarks
 
