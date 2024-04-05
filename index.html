@@ -51,8 +51,8 @@
     let webcamRunning = false;
     let lastVideoTime = -1;
     let results = undefined; // Объявляем переменную results
-    let cubeAdded = false;
-    let cube = undefined;
+    let modelAdded = false;
+    let model = undefined;
     let position = new Object;
 
     // Before we can use HandLandmarker class we must wait for it to finish
@@ -122,7 +122,7 @@
         // Проверяем, что handLandmarker создан
         if (!handLandmarker || !webcamRunning) {
             canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            cube.visible = false;
+            model.visible = false;
             console.log("HandLandmarker is not loaded or webcam is not running.");
             return;
         }
@@ -142,7 +142,7 @@
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-        // Отрисовываем лэндмарки, создаем куб, позиционируем его относительно лэндмарки
+        // Отрисовываем лэндмарки, создаем модель, позиционируем ее относительно лэндмарки
         if (results && results.landmarks) {
             for (const landmarks of results.landmarks) {
                 drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
@@ -151,11 +151,11 @@
                 });
                 drawLandmarks(canvasCtx, landmarks, { color: "#00BFFF", lineWidth: 2 });
             }
-            if(!cubeAdded && results.landmarks.length !== 0) {
-                addCube();
-                cubeAdded = true;
+            if(!modelAdded && results.landmarks.length !== 0) {
+                addModel();
+                modelAdded = true;
             }
-            else if (cubeAdded && results.landmarks.length !== 0) {
+            else if (modelAdded && results.landmarks.length !== 0) {
                 ////
                 //// Приведение к общей системе координат
                 ////
@@ -163,13 +163,13 @@
                 position.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
                 position.z = 0; // Без Z позиция не копируется
                 ////
-                cube.scale.set(results.landmarks[0][14].z*2, results.landmarks[0][14].z*2, results.landmarks[0][14].z*2);
+                model.scale.set(results.landmarks[0][14].z*2, results.landmarks[0][14].z*2, results.landmarks[0][14].z*2);
                 
-                cube.position.copy(position);
-                cube.visible = true; // Показываем куб
+                model.position.copy(position);
+                model.visible = true; // Показываем модель
             }
-            else if (cubeAdded && results.landmarks.length == 0) {
-                cube.visible = false; // Скрываем куб
+            else if (modelAdded && results.landmarks.length == 0) {
+                model.visible = false; // Скрываем модель
             }
         }
 
@@ -180,8 +180,8 @@
         }
     }
 
-    // Функция для добавления куба на сцену
-    function addCube() {
+    // Функция для добавления модели на сцену
+    function addModel() {
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(20, canvasElement.width / canvasElement.height, 0.1, 100);
         camera.position.z = 5;
@@ -192,17 +192,25 @@
         renderer.domElement.style.left = "0";
         document.getElementById("overlay").appendChild(renderer.domElement);
 
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0xFFA500, wireframe: true });
-        cube = new THREE.Mesh(geometry, material);
-        cube.scale.set(0.3, 0.3, 0.3);
-        scene.add(cube);
+        const loader = new THREE.GLTFLoader();
+        loader.load(
+            'app/models/scene.gltf',
+            function (gltf) {
+                model = gltf.scene;
+                model.scale.set(0.3, 0.3, 0.3);
+                scene.add(model);
+            },
+            undefined,
+            function (error) {
+                console.error('An error happened', error);
+            }
+        );
 
         function animate() {
             requestAnimationFrame(animate);
-            if (cube) {
-                cube.rotation.x += 0.01;
-                cube.rotation.y += 0.01;
+            if (model) {
+                model.rotation.x += 0.01;
+                model.rotation.y += 0.01;
             }
             renderer.render(scene, camera);
         }
