@@ -203,6 +203,9 @@
         renderer.domElement.style.left = "0";
         document.getElementById("overlay").appendChild(renderer.domElement);
 
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        directionalLight.position.set(0, 20, 15);
+        scene.add(directionalLight);
         
         const loader = new GLTFLoader();
         loader.load(
