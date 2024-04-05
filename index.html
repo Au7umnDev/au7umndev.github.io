@@ -201,31 +201,18 @@
         renderer.domElement.style.position = "absolute";
         renderer.domElement.style.top = "0";
         renderer.domElement.style.left = "0";
+        renderer.physicallyCorrectLights = true;
+
         document.getElementById("overlay").appendChild(renderer.domElement);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-        directionalLight.position.set(0, 20, 15);
-        scene.add(directionalLight);
+        const ambientLight = new AmbientLight(0xFFFFFF);
+        ambientLight.intensity = 4;
+        scene.add(ambientLight);
         
         const loader = new GLTFLoader();
         loader.load(
             'app/models/simple_ring.glb',
             function (gltf) {
-                gltf.scene.traverse(function (child) {
-                    if (child.isMesh) {
-                        let m = child;
-                        m.receiveShadow = true;
-                        m.castShadow = true;
-                    }
-                    if (child.isLight) {
-                        let l = child;
-                        l.castShadow = true;
-                        l.shadow.bias = -0.003;
-                        l.shadow.mapSize.width = 2048;
-                        l.shadow.mapSize.height = 2048;
-                    }
-                })
-
                 model = gltf.scene;
                 model.scale.set(0.3, 0.3, 0.3);
                 scene.add(model);
