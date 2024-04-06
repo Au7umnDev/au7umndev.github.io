@@ -240,15 +240,15 @@
     }
 
     // Функция для расчета расстояния от точки до камеры в метрах
-    function calculateDistanceToCamera(point, camera) {
+    function calculateDistanceToCamera(point, video) {
         let cameraFov = 40 * (Math.PI / 180); // Угол обзора камеры
-        let focalLength = camera.height / (2 * Math.tan(cameraFov / 2)); // Фокусное расстояние камеры
+        let focalLength = video.videoHeight / (2 * Math.tan(cameraFov / 2)); // Фокусное расстояние камеры
         let screenPoint = {
-            x: point.x * camera.width + camera.width / 2,
-            y: -point.y * camera.height + camera.height / 2
+            x: point.x * video.videoWidth + video.videoWidth / 2,
+            y: -point.y * video.videoHeight + video.videoHeight / 2
         };
-        let dx = screenPoint.x - camera.width / 2;
-        let dy = screenPoint.y - camera.height / 2;
+        let dx = screenPoint.x - video.videoWidth / 2;
+        let dy = screenPoint.y - video.videoHeight / 2;
         let distance = Math.sqrt(dx * dx + dy * dy + focalLength * focalLength);
         console.log(distance);
         return distance / 1000; // Переводим в метры
