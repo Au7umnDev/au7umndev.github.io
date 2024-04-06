@@ -177,14 +177,14 @@
                 position.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
                 position.z = 0; // Без Z позиция не копируется
                 ////
-                model.scale.set(results.landmarks[0][14].z*2, results.landmarks[0][14].z*2, results.landmarks[0][14].z*2);
+                //model.scale.set(results.landmarks[0][14].z*2, results.landmarks[0][14].z*2, results.landmarks[0][14].z*2);
                 
                 model.position.copy(position);
                 model.visible = true; // Показываем модель
 
                 // Установка позиции камеры
-                camera.position.set(model.position.x, model.position.y, model.position.z + 2);
-                
+                camera.position.set(0, 0, model.position.z + 2);
+
                 console.log('Distance from camera to object: ' + camera.position.distanceTo(model.position));
             }
             else if (modelAdded && results.landmarks.length == 0) {
