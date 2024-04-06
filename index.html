@@ -178,6 +178,8 @@
                 
                 model.position.copy(position);
                 model.visible = true; // Показываем модель
+
+                console.log('Distance from camera to object: ' + camera.position.distanceTo(model.position));
             }
             else if (modelAdded && results.landmarks.length == 0) {
                 model.visible = false; // Скрываем модель
