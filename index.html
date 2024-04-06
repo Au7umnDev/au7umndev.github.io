@@ -235,18 +235,6 @@
             }
         );
 
-        const cubeGeometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0xFFA500, wireframe: true });
-
-        let cube = new THREE.Mesh(cubeGeometry, material);
-        cube.scale.set(0.3, 0.3, 0.3);
-        let position1 = new Object;
-        position1.x = 0;
-        position1.y = 0;
-        position1.z = 0;
-        cube.position.copy(position1);
-        scene.add(cube);
-
         function animate() {
             requestAnimationFrame(animate);
             // if (model) {
