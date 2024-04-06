@@ -22,7 +22,7 @@
         "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
         }
     }
-    </script>
+</script>
 
 <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
@@ -63,7 +63,7 @@
     let lastVideoTime = -1;
     let results = undefined; // Объявляем переменную results
     let modelAdded = false;
-    let model = new THREE.Object3D( );
+    let model = new THREE.Object3D();
     let position = new Object;
 
     // Before we can use HandLandmarker class we must wait for it to finish
@@ -178,6 +178,10 @@
                 
                 model.position.copy(position);
                 model.visible = true; // Показываем модель
+
+                // Рассчет расстояния от камеры до точки в метрах
+                const distance = calculateDistanceToCamera(results.landmarks[0][14], video);
+                console.log('Distance to camera:', distance.toFixed(2), 'm');
             }
             else if (modelAdded && results.landmarks.length == 0) {
                 model.visible = false; // Скрываем модель
@@ -215,15 +219,6 @@
             'app/models/ring_black_and_red.glb',
             function (gltf) {
                 model = gltf.scene;
-                // model.traverse((object) => {
-                //     if (object.isMesh) {
-                //     const map = object.material && object.material.map ? object.material.map : null
-                //     const material = new THREE.MeshStandardMaterial;
-                //     material.map = map;
-                //     object.material = material;
-                //     }
-                // });
-
                 model.scale.set(0.3, 0.3, 0.3);
                 scene.add(model);
             },
@@ -244,6 +239,19 @@
         animate();
     }
 
+    // Функция для расчета расстояния от точки до камеры в метрах
+    function calculateDistanceToCamera(point, camera) {
+        const cameraFov = 40 * (Math.PI / 180); // Угол обзора камеры
+        const focalLength = camera.height / (2 * Math.tan(cameraFov / 2)); // Фокусное расстояние камеры
+        const screenPoint = {
+            x: point.x * camera.width + camera.width / 2,
+            y: -point.y * camera.height + camera.height / 2
+        };
+        const dx = screenPoint.x - camera.width / 2;
+        const dy = screenPoint.y - camera.height / 2;
+        const distance = Math.sqrt(dx * dx + dy * dy + focalLength * focalLength);
+        return distance / 1000; // Переводим в метры
+    }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm/vision_wasm_internal.js" crossorigin="anonymous"></script>
