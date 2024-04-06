@@ -178,11 +178,6 @@
                 
                 model.position.copy(position);
                 model.visible = true; // Показываем модель
-
-                //console.log(position);
-                // Рассчет расстояния от камеры до точки в метрах
-                let distance = calculateDistanceToCamera(position, video);
-                console.log('Distance to camera:', distance.toFixed(4), 'm');
             }
             else if (modelAdded && results.landmarks.length == 0) {
                 model.visible = false; // Скрываем модель
@@ -239,31 +234,6 @@
         }
         animate();
     }
-
-    function calculateDistanceToCamera(point, video) {
-    // Преобразование координат из диапазона [-1, 1] в пиксели относительно размеров видеопотока
-    const x = (point.x + 1) * video.videoWidth / 2;
-    const y = (-point.y + 1) * video.videoHeight / 2;
-
-    console.log('x: ' + x + '. y: ' + y);
-
-    // Рассчет расстояния от центра видеопотока до точки в пикселях
-    const dx = x - video.videoWidth / 2;
-    const dy = y - video.videoHeight / 2;
-    const distanceToCenter = Math.sqrt(dx * dx + dy * dy);
-
-    // Угол обзора камеры в радианах
-    const cameraFov = 70 * (Math.PI / 180);
-    // Фокусное расстояние камеры (предположим, что оно равно ширине видеопотока)
-    const focalLength = video.videoWidth / (2 * Math.tan(cameraFov / 2));
-
-    // Расстояние до точки в метрах
-    const distance = distanceToCenter * focalLength / video.videoWidth;
-
-    return distance;
-}
-
-
 
 </script>
 
