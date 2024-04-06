@@ -245,6 +245,8 @@
     const x = (point.x + 1) * video.videoWidth / 2;
     const y = (-point.y + 1) * video.videoHeight / 2;
 
+    console.log('x: ' + x + '. y: ' + y);
+
     // Рассчет расстояния от центра видеопотока до точки в пикселях
     const dx = x - video.videoWidth / 2;
     const dy = y - video.videoHeight / 2;
