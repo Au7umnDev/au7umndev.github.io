@@ -175,7 +175,7 @@
                 ////
                 position.x = (results.landmarks[0][14].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
                 position.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
-                position.z = 0; // Без Z позиция не копируется
+                position.z = -2; // Без Z позиция не копируется
                 ////
                 let newScale = results.landmarks[0][0].z*50000;
 
