@@ -108,7 +108,7 @@
         if (webcamRunning) {
             // Stop webcam and processing
             video.srcObject.getTracks().forEach(track => track.stop()); // Остановка всех треков видео
-            video.srcObject = null;
+            video.srcObject = null; 
             video.removeEventListener("loadeddata", predictWebcam);
             enableWebcamButton.innerText = "ENABLE WEBCAM";
             webcamRunning = false;
@@ -182,6 +182,9 @@
                 model.position.copy(position);
                 model.visible = true; // Показываем модель
 
+                // Установка позиции камеры
+                camera.position.set(model.position.x, model.position.y, model.position.z + 2);
+                
                 console.log('Distance from camera to object: ' + camera.position.distanceTo(model.position));
             }
             else if (modelAdded && results.landmarks.length == 0) {
