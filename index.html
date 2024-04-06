@@ -185,7 +185,8 @@
                 // Установка позиции камеры
                 camera.position.set(0, 0, model.position.z + 2);
 
-                console.log('Distance from camera to object: ' + camera.position.distanceTo(model.position));
+                //console.log('Distance from camera to object: ' + camera.position.distanceTo(model.position));
+                console.log(results.landmarks[0][0].z);
             }
             else if (modelAdded && results.landmarks.length == 0) {
                 model.visible = false; // Скрываем модель
