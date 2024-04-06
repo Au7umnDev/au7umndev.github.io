@@ -247,17 +247,18 @@
         const focalLengthHorizontal = (video.videoWidth / 2) / Math.tan(cameraFovHorizontal / 2); // Фокусное расстояние камеры по горизонтали
         const focalLengthVertical = (video.videoHeight / 2) / Math.tan(cameraFovVertical / 2); // Фокусное расстояние камеры по вертикали
         const screenPoint = {
-            x: point.x * video.videoWidth + video.videoWidth / 2,
-            y: -point.y * video.videoHeight + video.videoHeight / 2
+            x: point.x * video.videoWidth,
+            y: point.y * video.videoHeight
         };
-        const dx = screenPoint.x - video.videoWidth / 2;
-        const dy = screenPoint.y - video.videoHeight / 2;
-        const distanceHorizontal = Math.sqrt(dx * dx + focalLengthHorizontal * focalLengthHorizontal);
-        const distanceVertical = Math.sqrt(dy * dy + focalLengthVertical * focalLengthVertical);
+        const dx = Math.abs(screenPoint.x - video.videoWidth / 2);
+        const dy = Math.abs(screenPoint.y - video.videoHeight / 2);
+        const distanceHorizontal = (dx * focalLengthHorizontal) / (video.videoWidth / 2);
+        const distanceVertical = (dy * focalLengthVertical) / (video.videoHeight / 2);
         const distance = Math.sqrt(distanceHorizontal * distanceHorizontal + distanceVertical * distanceVertical);
         console.log(distance);
         return distance / 1000; // Переводим в метры
     }
+
 
 </script>
 
