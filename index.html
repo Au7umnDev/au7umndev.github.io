@@ -43,10 +43,11 @@
             <video id="webcam" style="position: abso" autoplay="" playsinline=""></video>
             <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
             <div id="overlay"></div>
+            
+            <label for="ringSizeTextBox">Current size of your ring:</label><br> 
+            <input type="text" id="ringSizeTextBox" value="" readonly>
         </div>
     </div>
-
-    <div id="landmarksOutput"></div> <!-- Вывод landmarks -->
 </section>
 
 <script id="rendered-js" type="module">
@@ -54,7 +55,7 @@
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     import * as THREE from 'three';
     const demosSection = document.getElementById("demos");
-    const landmarksOutput = document.getElementById("landmarksOutput"); // Получаем div для вывода landmarks
+    const ringSizeTextBox = document.getElementById("ringSizeTextBox");
 
     let handLandmarker = undefined;
     let runningMode = "VIDEO";
@@ -178,7 +179,7 @@
                 position.z = -1; // Без Z позиция не копируется
                 ////
                 let newScale = results.landmarks[0][0].z*50000;
-
+                ringSizeTextBox.value = newScale;
                 model.scale.set(newScale, newScale, newScale);
                 
                 model.position.copy(position);
