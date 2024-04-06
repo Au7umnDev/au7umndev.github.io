@@ -147,7 +147,7 @@
         if (currentTime !== lastVideoTime) {
             lastVideoTime = currentTime;
             results = handLandmarker.detectForVideo(video, performance.now());
-            console.log('results: ', results);  
+            //console.log('results: ', results);  
         }
 
         canvasCtx.save();
@@ -180,8 +180,8 @@
                 model.visible = true; // Показываем модель
 
                 // Рассчет расстояния от камеры до точки в метрах
-                const distance = calculateDistanceToCamera(results.landmarks[0][14], video);
-                console.log('Distance to camera:', distance.toFixed(2), 'm');
+                let distance = calculateDistanceToCamera(results.landmarks[0][14], video);
+                console.log('Distance to camera:', distance.toFixed(4), 'm');
             }
             else if (modelAdded && results.landmarks.length == 0) {
                 model.visible = false; // Скрываем модель
