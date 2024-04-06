@@ -89,7 +89,7 @@
     const canvasCtx = canvasElement.getContext("2d");
 
     const camera = new THREE.PerspectiveCamera(20, canvasElement.width / canvasElement.height, 0.1, 100);
-    camera.position.z = 0;
+    camera.position.z = 5;
 
     // Check if webcam access is supported.
     const hasGetUserMedia = () => { var _a; return !!((_a = navigator.mediaDevices) === null || _a === void 0 ? void 0 : _a.getUserMedia); };
@@ -177,13 +177,15 @@
                 position.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
                 position.z = 0; // Без Z позиция не копируется
                 ////
-                model.scale.set(results.landmarks[0][0].z*20000, results.landmarks[0][0].z*200000, results.landmarks[0][0].z*20000);
+                let newScale = results.landmarks[0][0].z*30000;
+
+                model.scale.set(newScale, newScale, newScale);
                 
                 model.position.copy(position);
                 model.visible = true; // Показываем модель
 
                 // Установка позиции камеры
-                camera.position.set(0, 0, model.position.z + 5);
+                //camera.position.set(0, 0, model.position.z + 5);
 
                 //console.log('Distance from camera to object: ' + camera.position.distanceTo(model.position));
                 //console.log(results.landmarks[0][0].z);
@@ -222,7 +224,7 @@
             'app/models/ring_black_and_red.glb',
             function (gltf) {
                 model = gltf.scene;
-                model.scale.set(0.3, 0.3, 0.3);
+                model.scale.set(0.01, 0.01, 0.01);
                 scene.add(model);
             },
             undefined,
