@@ -88,6 +88,9 @@
     const canvasElement = document.getElementById("output_canvas");
     const canvasCtx = canvasElement.getContext("2d");
 
+    const camera = new THREE.PerspectiveCamera(20, canvasElement.width / canvasElement.height, 0.1, 100);
+    camera.position.z = 5;
+
     // Check if webcam access is supported.
     const hasGetUserMedia = () => { var _a; return !!((_a = navigator.mediaDevices) === null || _a === void 0 ? void 0 : _a.getUserMedia); };
     
@@ -196,8 +199,6 @@
     // Функция для добавления модели на сцену
     function addModel() {
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(20, canvasElement.width / canvasElement.height, 0.1, 100);
-        camera.position.z = 5;
         const renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(canvasElement.width, canvasElement.height);
         renderer.domElement.style.position = "absolute";
