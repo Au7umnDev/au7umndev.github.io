@@ -179,6 +179,7 @@
                 model.position.copy(position);
                 model.visible = true; // Показываем модель
 
+                console.log(position);
                 // Рассчет расстояния от камеры до точки в метрах
                 let distance = calculateDistanceToCamera(position, video);
                 console.log('Distance to camera:', distance.toFixed(4), 'm');
@@ -255,7 +256,7 @@
         const distanceHorizontal = (dx * focalLengthHorizontal) / (video.videoWidth / 2);
         const distanceVertical = (dy * focalLengthVertical) / (video.videoHeight / 2);
         const distance = Math.sqrt(distanceHorizontal * distanceHorizontal + distanceVertical * distanceVertical);
-        console.log(distance);
+        //console.log(distance);
         return distance / 1000; // Переводим в метры
     }
 
