@@ -89,7 +89,7 @@
     const canvasCtx = canvasElement.getContext("2d");
 
     const camera = new THREE.PerspectiveCamera(70, canvasElement.width / canvasElement.height, 0.1, 100);
-    camera.position.z = 0;
+    camera.position.z = 1;
 
     // Check if webcam access is supported.
     const hasGetUserMedia = () => { var _a; return !!((_a = navigator.mediaDevices) === null || _a === void 0 ? void 0 : _a.getUserMedia); };
