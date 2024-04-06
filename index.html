@@ -177,7 +177,7 @@
                 position.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
                 position.z = 0; // Без Z позиция не копируется
                 ////
-                let newScale = results.landmarks[0][0].z*30000;
+                let newScale = results.landmarks[0][0].z*50000;
 
                 model.scale.set(newScale, newScale, newScale);
                 
