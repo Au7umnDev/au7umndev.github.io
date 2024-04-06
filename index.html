@@ -147,12 +147,12 @@
         canvasElement.width = video.videoWidth;
         canvasElement.height = video.videoHeight;
 
-        // const currentTime = video.currentTime;
-        // if (currentTime !== lastVideoTime) {
-            // lastVideoTime = currentTime;
+        const currentTime = video.currentTime;
+        if (currentTime !== lastVideoTime) {
+            lastVideoTime = currentTime;
             results = handLandmarker.detectForVideo(video, performance.now());
             console.log('results: ', results);  
-        // }
+        }
 
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
