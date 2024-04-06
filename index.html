@@ -151,7 +151,7 @@
         if (currentTime !== lastVideoTime) {
             lastVideoTime = currentTime;
             results = handLandmarker.detectForVideo(video, performance.now());
-            //console.log('results: ', results);  
+            console.log('results: ', results);  
         }
 
         canvasCtx.save();
@@ -171,8 +171,6 @@
                 modelAdded = true;
             }
             else if (modelAdded && results.landmarks.length !== 0) {
-                ringSizeTextBox.value = 12312312313132312;
-
                 ////
                 //// Приведение к общей системе координат
                 ////
