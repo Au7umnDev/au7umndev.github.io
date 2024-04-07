@@ -152,7 +152,7 @@
         if (currentTime !== lastVideoTime) {
             lastVideoTime = currentTime;
             results = handLandmarker.detectForVideo(video, performance.now());
-            console.log('results: ', results);  
+            //console.log('results: ', results);  
         }
 
         canvasCtx.save();
@@ -196,6 +196,7 @@
 
                 // Преобразуем радианы в градусы и вращаем модель по оси Z
                 let degrees = angle * (180 / Math.PI);
+                console.log(degrees);
                 model.rotation.z = degrees;
 
                 // Установка позиции камеры
