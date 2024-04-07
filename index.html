@@ -65,8 +65,9 @@
     let results = undefined; // Объявляем переменную results
     let modelAdded = false;
     let model = new THREE.Object3D();
-    let position = new Object;
+    let position14 = new Object;
     let position13 = new Object;
+    let positionRing = new Object;
 
     // Before we can use HandLandmarker class we must wait for it to finish
     // loading. Machine Learning models can be large and take a moment to
@@ -175,18 +176,23 @@
                 ////
                 //// Приведение к общей системе координат
                 //// Для 0 14
-                position.x = (results.landmarks[0][14].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
-                position.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
-                position.z = -1; // Без Z позиция не копируется
+                position14.x = (results.landmarks[0][14].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
+                position14.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
+                position14.z = -1; // Без Z позиция не копируется
                 //// Для 0 13
                 position13.x = (results.landmarks[0][13].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
                 position13.y = (1 - results.landmarks[0][13].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
+                //// Для кольца
+                positionRing.x = position14.x - position13.x;
+                positionRing.y = position14.y - position13.y;
+                positionRing.z = position14.z;
                 ////
+
                 let newScale = results.landmarks[0][0].z*50000;
                 ringSizeTextBox.value = newScale;
                 model.scale.set(newScale, newScale, newScale);
                 
-                model.position.copy(position);
+                model.position.copy(positionRing);
                 model.visible = true; // Показываем модель
 
                 // Вычисляем угол между горизонтальной прямой и прямой, образованной точками results.landmarks[0][13] и results.landmarks[0][14]
@@ -197,7 +203,7 @@
                 // Преобразуем радианы в градусы и вращаем модель по оси Z
                 let degrees = angle * (180 / Math.PI);
                 console.log(degrees);
-                model.rotation.z = degrees/35;
+                model.rotation.z = degrees/30;
 
                 // Установка позиции камеры
                 //camera.position.set(0, 0, model.position.z + 5);
