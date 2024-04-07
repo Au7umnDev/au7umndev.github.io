@@ -1,4 +1,4 @@
-@use "@material";
+/* @use "@material";
 body {
   font-family: roboto;
   margin: 2em;
@@ -26,7 +26,7 @@ em {
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
 } */
-
+/*
 section {
   opacity: 1;
   transition: opacity 500ms ease-in-out;
@@ -96,4 +96,4 @@ footer {
 
 .detectOnClick img {
   width: 100%;
-}
+} */
