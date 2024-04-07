@@ -184,8 +184,8 @@
                 position13.x = (results.landmarks[0][13].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
                 position13.y = (1 - results.landmarks[0][13].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
                 //// Для кольца
-                positionRing.x = position13.x - position14.x;
-                positionRing.y = position13.y - position14.y;
+                positionRing.x = position14.x;
+                positionRing.y = position14.y;
                 positionRing.z = position14.z;
                 ////
 
