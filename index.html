@@ -44,6 +44,10 @@
                 <input type="checkbox" id="toggleModelMovement" checked>
                 <label for="toggleModelMovement">Toggle Model Movement</label>
             </div>
+            <div>
+                <label for="ringSizeSlider">Изменить размер кольца:</label><br>
+                <input type="range" id="ringSizeSlider" min="0" max="100" value="50">
+            </div>
         </div>
     </section>
 
@@ -74,6 +78,7 @@
         const toggleConnectorsCheckbox = document.getElementById("toggleConnectors");
         const toggleLandmarksCheckbox = document.getElementById("toggleLandmarks");
         const toggleModelMovementCheckbox = document.getElementById("toggleModelMovement");
+        const ringSizeSlider = document.getElementById("ringSizeSlider");
 
         let handLandmarker = undefined;
         let runningMode = "VIDEO";
@@ -208,6 +213,9 @@
                         positionRing.y = position14.y;
                         positionRing.z = position14.z;
                         ////
+
+                        sliderValue = parseInt(ringSizeSlider.value) * 2 / 100;
+                        //let newScale = results.landmarks[0][0].z * 50000 * sliderValue;
 
                         let newScale = results.landmarks[0][0].z * 50000;
                         ringSizeTextBox.value = newScale;
