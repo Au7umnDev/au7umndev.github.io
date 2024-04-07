@@ -37,12 +37,12 @@
                 <input type="text" id="ringSizeTextBox" value="" readonly>
             </div>
             <div>
-                <input type="checkbox" id="toggleConnectors" checked>
-                <label for="toggleConnectors">Toggle Connectors</label>
                 <input type="checkbox" id="toggleLandmarks" checked>
-                <label for="toggleLandmarks">Toggle Landmarks</label>
-                <input type="checkbox" id="toggleModelMovement" checked>
-                <label for="toggleModelMovement">Toggle Model Movement</label>
+                <label for="toggleLandmarks">Рисовать распознаваемые узлы</label>
+                <input type="checkbox" id="toggleConnectors" checked>
+                <label for="toggleConnectors">Рисовать связи между узлами</label>
+                <input type="checkbox" id="toggleModelMovement">
+                <label for="toggleModelMovement">Заморозить движение кольца по Y</label>
             </div>
             <div>
                 <label for="ringSizeSlider">Изменить размер кольца:</label><br>
@@ -199,41 +199,40 @@
                     addModel();
                     modelAdded = true;
                 } else if (modelAdded && results.landmarks.length !== 0) {
-                    if (toggleModelMovementCheckbox.checked) {
-                        //// Приведение к общей системе координат
-                        //// Для 0 14
-                        position14.x = (results.landmarks[0][14].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
-                        position14.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
-                        position14.z = -1; // Без Z позиция не копируется
-                        //// Для 0 13
-                        position13.x = (results.landmarks[0][13].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
-                        position13.y = (1 - results.landmarks[0][13].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
-                        //// Для кольца
-                        positionRing.x = position14.x;
-                        positionRing.y = position14.y;
-                        positionRing.z = position14.z;
-                        ////
+                    //// Приведение к общей системе координат
+                    //// Для 0 14
+                    position14.x = (results.landmarks[0][14].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
+                    position14.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
+                    position14.z = -1; // Без Z позиция не копируется
+                    //// Для 0 13
+                    position13.x = (results.landmarks[0][13].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
+                    position13.y = (1 - results.landmarks[0][13].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
+                    //// Для кольца
+                    positionRing.x = position14.x; 
+                    if (toggleModelMovementCheckbox.checked) positionRing.y = model.position.y;
+                    else positionRing.y = position14.y;
+                    positionRing.z = position14.z;
+                    ////
 
-                        sliderValue = parseInt(ringSizeSlider.value) * 2 / 100;
-                        //let newScale = results.landmarks[0][0].z * 50000 * sliderValue;
+                    let sliderValue = parseInt(ringSizeSlider.value) * 2 / 100;
+                    //let newScale = results.landmarks[0][0].z * 50000 * sliderValue;
 
-                        let newScale = results.landmarks[0][0].z * 50000;
-                        ringSizeTextBox.value = newScale;
-                        model.scale.set(newScale, newScale, newScale);
+                    let newScale = results.landmarks[0][0].z * 50000;
+                    ringSizeTextBox.value = newScale;
+                    model.scale.set(newScale, newScale, newScale);
 
-                        model.position.copy(positionRing);
-                        model.visible = true; // Показываем модель
+                    model.position.copy(positionRing);
+                    model.visible = true; // Показываем модель
 
-                        // Вычисляем угол между горизонтальной прямой и прямой, образованной точками results.landmarks[0][13] и results.landmarks[0][14]
-                        let deltaY = position13.y - position14.y;
-                        let deltaX = position13.x - position14.x;
-                        let angle = Math.atan2(deltaY, deltaX);
+                    // Вычисляем угол между горизонтальной прямой и прямой, образованной точками results.landmarks[0][13] и results.landmarks[0][14]
+                    let deltaY = position13.y - position14.y;
+                    let deltaX = position13.x - position14.x;
+                    let angle = Math.atan2(deltaY, deltaX);
 
-                        // Преобразуем радианы в градусы и вращаем модель по оси Z
-                        let degrees = angle * (180 / Math.PI);
-                        //console.log(degrees);
-                        model.rotation.z = degrees / 30;
-                    }
+                    // Преобразуем радианы в градусы и вращаем модель по оси Z
+                    let degrees = angle * (180 / Math.PI);
+                    //console.log(degrees);
+                    model.rotation.z = degrees / 30;
                 } else if (modelAdded && results.landmarks.length == 0) {
                     model.visible = false; // Скрываем модель
                 }
