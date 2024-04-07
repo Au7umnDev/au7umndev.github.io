@@ -21,12 +21,12 @@
 
     <section id="demos" class="">
         <h2>Demo: v9</h2>
-        <p>Расположите свою руку в поле зрения камеры для того, чтобы примерить кольцо.<br>Нажмите на кнопку <b>Enable webcam</b> ниже и предоставьте веб-приложению доступ к камере</p>
+        <p>Расположите свою руку в поле зрения камеры для того, чтобы примерить кольцо.<br>Нажмите на кнопку <b>"Примерить"</b> ниже и предоставьте веб-приложению доступ к камере</p>
 
         <div id="liveView" class="videoView">
             <button id="webcamButton" class="mdc-button mdc-button--raised">
                 <span class="mdc-button__ripple"></span>
-                <span class="mdc-button__label">ENABLE WEBCAM</span>
+                <span class="mdc-button__label">Примерить</span>
             </button>
             <div id="try_on" style="position: relative;">
                 <video id="webcam" style="position: absolute" autoplay="" playsinline=""></video>
@@ -138,7 +138,7 @@
                 video.srcObject.getTracks().forEach(track => track.stop()); // Остановка всех треков видео
                 video.srcObject = null;
                 video.removeEventListener("loadeddata", predictWebcam);
-                enableWebcamButton.innerText = "ENABLE WEBCAM";
+                enableWebcamButton.innerText = "Примерить";
                 webcamRunning = false;
             } else {
                 // Start webcam and processing
@@ -151,7 +151,7 @@
                     video.srcObject = stream;
                     video.addEventListener("loadeddata", predictWebcam);
                     document.getElementById("try_on").style.display = "block";
-                    enableWebcamButton.innerText = "DISABLE WEBCAM";
+                    enableWebcamButton.innerText = "Завершить";
                     webcamRunning = true;
                 }).catch((error) => {
                     console.error("Error accessing webcam:", error);
