@@ -23,16 +23,16 @@
         <h2>Demo: v8 Webcam continuous hands landmarks detection</h2>
         <p>Hold your hand in front of your webcam to get real-time hand landmarker detection.<br>Click <b>enable webcam</b> below and grant access to the webcam if prompted.</p>
 
-        <div id="liveView" class="videoView">
-            <button id="webcamButton" class="mdc-button mdc-button--raised">
-                <span class="mdc-button__ripple"></span>
-                <span class="mdc-button__label">ENABLE WEBCAM</span>
-            </button>
-            <div id="try_on" style="position: relative;">
+        <div id="try_on" style="position: relative;">
+            <div id="liveView" class="videoView">
+                <button id="webcamButton" class="mdc-button mdc-button--raised">
+                    <span class="mdc-button__ripple"></span>
+                    <span class="mdc-button__label">ENABLE WEBCAM</span>
+                </button>
                 <video id="webcam" style="position: absolute" autoplay="" playsinline=""></video>
                 <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
-                <div id="overlay"></div>
-
+            </div>
+            <div id="additionalOptions">
                 <label for="ringSizeTextBox">Current size of your ring:</label><br>
                 <input type="text" id="ringSizeTextBox" value="" readonly>
 
