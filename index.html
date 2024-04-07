@@ -196,8 +196,8 @@
                 model.visible = true; // Показываем модель
 
                 // Вычисляем угол между горизонтальной прямой и прямой, образованной точками results.landmarks[0][13] и results.landmarks[0][14]
-                let deltaY = position13.y - position.y;
-                let deltaX = position13.x - position.x;
+                let deltaY = position13.y - position14.y;
+                let deltaX = position13.x - position14.x;
                 let angle = Math.atan2(deltaY, deltaX);
 
                 // Преобразуем радианы в градусы и вращаем модель по оси Z
