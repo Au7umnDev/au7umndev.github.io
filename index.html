@@ -219,7 +219,7 @@
                     ////
 
                     let sliderValue = parseInt(ringSizeSlider.value) * 2 / 100;
-                    let newScale = results.landmarks[0][0].z * 50000 * sliderValue;
+                    let newScale = results.landmarks[0][0].z * 70000 * sliderValue;
                     //let newScale = results.landmarks[0][0].z * 50000;
                     ringSizeTextBox.value = newScale;
                     model.scale.set(newScale, newScale, newScale);
