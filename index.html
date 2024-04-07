@@ -42,11 +42,15 @@
                 <input type="checkbox" id="toggleConnectors" checked>
                 <label for="toggleConnectors">Рисовать связи между узлами</label>
                 <input type="checkbox" id="toggleModelMovement">
-                <label for="toggleModelMovement">Заморозить движение кольца по Y</label>
+                <label for="toggleModelMovement">Заморозить движение кольца по Y координатам</label>
             </div>
             <div>
                 <label for="ringSizeSlider">Изменить размер кольца:</label><br>
                 <input type="range" id="ringSizeSlider" min="0" max="100" value="50">
+            </div>
+            <div>
+                <label for="changeYoffset">Изменить положение кольца по Y координатам:</label><br>
+                <input type="range" id="changeYoffset" min="0" max="10" value="5" orient="vertical">
             </div>
         </div>
     </section>
