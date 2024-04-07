@@ -197,7 +197,7 @@
                 // Преобразуем радианы в градусы и вращаем модель по оси Z
                 let degrees = angle * (180 / Math.PI);
                 console.log(degrees);
-                model.rotation.z = degrees;
+                model.rotation.z = degrees/10;
 
                 // Установка позиции камеры
                 //camera.position.set(0, 0, model.position.z + 5);
