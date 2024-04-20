@@ -8,6 +8,7 @@
     <link rel="mask-icon" type="image/x-icon" href="https://cpwebassets.codepen.io/assets/favicon/logo-pin-b4b4269c16397ad2f0f7a01bcdf513a1994f4c94b8af2f191c09eb0d601762b1.svg" color="#111">
     <script src="https://cpwebassets.codepen.io/assets/common/stopExecutionOnTimeout-2c7831bb44f98c1391d6a4ffda0e1fd302503391ca806e7fcc7b9b87197aec26.js"></script>
     <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <link rel="stylesheet" href="app/css/modal.css">
 
     <script>
         window.console = window.console || function(t) {};
@@ -28,31 +29,37 @@
                 <span class="mdc-button__ripple"></span>
                 <span class="mdc-button__label">Примерить</span>
             </button>
-            <div id="try_on" style="position: relative;">
-                <video id="webcam" style="position: absolute" autoplay="" playsinline=""></video>
-                <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
-                <div id="overlay"></div>
+            <div id="try_on" style="display: none;">
+                <div style="position: relative;">
+                    <video id="webcam" style="position: relative" autoplay="" playsinline=""></video>
+                    <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
+                    <div id="overlay"></div>
 
-                <label for="ringSizeTextBox">Текущая размерность кольца относительно 3D-модели:</label><br>
-                <input type="text" id="ringSizeTextBox" value="" readonly>
-            </div>
-            <div>
-                <input type="checkbox" id="toggleLandmarks" checked>
-                <label for="toggleLandmarks">Рисовать распознаваемые узлы</label>
-                <input type="checkbox" id="toggleConnectors" checked>
-                <label for="toggleConnectors">Рисовать связи между узлами</label>
-                <input type="checkbox" id="toggleModelMovement">
-                <label for="toggleModelMovement">Заморозить движение кольца по Y координатам</label>
-            </div>
-            <div>
-                <label for="ringSizeSlider">Изменить размер кольца:</label><br>
-                <input type="range" id="ringSizeSlider" min="0" max="100" value="50">
-            </div>
-            <div>
-                <label for="changeYoffset">Изменить положение кольца по Y координатам:</label><br>
-                <input type="range" id="changeYoffset" min="0" max="10" value="5" style="-webkit-appearance: slider-vertical; writing-mode: bt-lr; height: 75px;">
+                    <label for="ringSizeTextBox">Текущая размерность кольца относительно 3D-модели:</label><br>
+                    <input type="text" id="ringSizeTextBox" value="" readonly>
+                </div>
+                <div>
+                    <input type="checkbox" id="toggleLandmarks" checked>
+                    <label for="toggleLandmarks">Рисовать распознаваемые узлы</label>
+                    <input type="checkbox" id="toggleConnectors" checked>
+                    <label for="toggleConnectors">Рисовать связи между узлами</label>
+                    <input type="checkbox" id="toggleModelMovement">
+                    <label for="toggleModelMovement">Заморозить движение кольца по Y координатам</label>
+                    <div>
+                        <label for="ringSizeSlider">Изменить размер кольца:</label><br>
+                        <input type="range" id="ringSizeSlider" min="0" max="100" value="50">
+                    </div>
+                    <div>
+                        <label for="changeYoffset">Изменить положение кольца по Y координатам:</label><br>
+                        <input type="range" id="changeYoffset" min="0" max="10" value="5" style="-webkit-appearance: slider-vertical; writing-mode: bt-lr; height: 75px;">
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="ring-card" data-ring-id="1">КОЛЬЦО ЗАЕБАТОО 1</div>
+        <div class="ring-card" data-ring-id="2">КОЛЬЦО ЗАЕБАТОО 2</div>
+        <div class="ring-card" data-ring-id="3">КОЛЬЦО ЗАЕБАТОО 3</div>
+        <div class="modal-container closed"></div>
     </section>
 
     <footer>
@@ -140,6 +147,7 @@
                 video.removeEventListener("loadeddata", predictWebcam);
                 enableWebcamButton.innerText = "Примерить";
                 webcamRunning = false;
+                document.getElementById("try_on").style.display = "none";
             } else {
                 // Start webcam and processing
                 const constraints = {
@@ -290,5 +298,69 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm/vision_wasm_internal.js" crossorigin="anonymous"></script>
+
+    <script>
+        const initCardsEvents = () => {
+            const modalContainer = document.getElementsByClassName('modal-container')[0];
+            Array.from(document.getElementsByClassName('ring-card')).forEach((ringCardElement) => {
+                const ringId = parseInt(ringCardElement.getAttribute('data-ring-id'));
+                ringCardElement.onclick = () => {
+                    const html = getRingModalHtml(ringId);
+                    modalContainer.innerHTML = html;
+                    modalContainer.classList.replace('closed', 'opened');
+                }
+            })
+        }
+        initCardsEvents();
+
+        const buttonTryHandler = (event) => {
+            alert(`открываем модалку с примеркой кольца id=${event.target.getAttribute('data-ring-id')} (камера)`);
+        }
+
+        const closeRingModal = () => {
+            const modal = document.getElementsByClassName('ring-modal')[0];
+            const modalContainer = document.getElementsByClassName('modal-container')[0];
+            modal.remove();
+            modalContainer.classList.replace('opened', 'closed');
+        }
+
+        const ringsRepository = {
+            1: {
+                name: 'ring_black_and_red 1',
+                imageSrc: 'google.com',
+                modelPath: 'app/models/ring_black_and_red.glb',
+                decscription: 'asdasd'
+            },
+            2: {
+                name: 'asdasd 2',
+                imageSrc: 'google.com',
+                modelSrc: '',
+                decscription: 'asdasd'
+            },
+            3: {
+                name: 'asdasd 3',
+                imageSrc: 'google.com',
+                modelSrc: '',
+                decscription: 'asdasd'
+            },
+        }
+
+        const getRingModalHtml = (ringId) => {
+            const ringData = ringsRepository[ringId];
+            return `<div class="ring-modal">
+                <div class="picture">
+                    <img src="${ringData.imageSrc}"></img>
+                </div>
+                <div class="title">
+                    ${ringData.name}
+                </div>
+                <div class="description">
+                    ${ringData.decscription}
+                </div>
+                <button data-ring-id=${ringId} onclick="buttonTryHandler(event)">Try</button>
+                <button onclick="closeRingModal()">Close</button>
+            </div>`
+        }
+    </script>
 </body>
 </html>
