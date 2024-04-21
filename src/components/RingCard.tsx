@@ -2,26 +2,6 @@ import { Button, ButtonGroup, Card, CardBody, CardFooter, CardHeader, Divider, H
 import React, { useState } from 'react'
 import ModalRenderer from './ModalRenderer'
 
-const ringsRepository = [
-    {
-        name: 'ring_black_and_red 1',
-        imageSrc: 'google.com',
-        modelPath: 'app/models/ring_black_and_red.glb',
-        decscription: 'asdasd'
-    },
-    {
-        name: 'asdasd 2',
-        imageSrc: 'google.com',
-        modelPath: '',
-        decscription: 'asdasd'
-    },
-    {
-        name: 'asdasd 3',
-        imageSrc: 'google.com',
-        modelPath: '',
-        decscription: 'asdasd'
-    },
-]
 
 type Ring = {
     name: string,
