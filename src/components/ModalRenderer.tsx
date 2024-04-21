@@ -23,6 +23,7 @@ type Props = {
 function ActionModal({ isOpen, onClose, ring }: Props) {
     const demosSectionRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
     const ringSizeTextBoxRef = useRef<HTMLInputElement>(null);
     const toggleConnectorsCheckboxRef = useRef<HTMLInputElement>(null);
     const toggleLandmarksCheckboxRef = useRef<HTMLInputElement>(null);
@@ -38,12 +39,107 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     const [position13, setPosition13] = useState<any>({});
     const [positionRing, setPositionRing] = useState<any>({});
 
+    function addModel() {
+        // Your logic for adding 3D model
+    };
+
+    const predictWebcam = async () => {
+        alert('Entered predictWebcam!');
+
+        const video = videoRef.current;
+        const canvasElement = canvasRef.current;
+        const canvasCtx = canvasElement?.getContext("2d");
+
+        if (!canvasElement || !canvasCtx || !handLandmarker || !webcamRunning || !video) {
+            if (canvasCtx) {
+                canvasCtx.clearRect(0, 0, canvasElement?.width || 0, canvasElement?.height || 0);
+            }
+            setModelAdded(false);
+            console.log("HandLandmarker is not loaded or webcam is not running.");
+            return;
+        }
+    
+        canvasElement.style.width = videoRef.current?.videoWidth + 'px';
+        canvasElement.style.height = videoRef.current?.videoHeight + 'px';
+        canvasElement.width = videoRef.current?.videoWidth || 0;
+        canvasElement.height = videoRef.current?.videoHeight || 0;
+
+        const currentTime = videoRef.current?.currentTime || 0;
+        if (currentTime !== videoRef.current?.currentTime) {
+            setResults(handLandmarker.detectForVideo(videoRef.current!, performance.now()));
+        }
+
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+        if (results && results.landmarks) {
+            for (const landmarks of results.landmarks) {
+                if (toggleConnectorsCheckboxRef.current?.checked) {
+                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+                        color: "#FFFFFF",
+                        lineWidth: 5
+                    });
+                }
+                if (toggleLandmarksCheckboxRef.current?.checked) {
+                    drawLandmarks(canvasCtx, landmarks, {
+                        color: "#00BFFF",
+                        lineWidth: 2
+                    });
+                }
+            }
+            if (!modelAdded && results.landmarks.length !== 0) {
+                addModel();
+                setModelAdded(true);
+            } else if (modelAdded && results.landmarks.length !== 0) {
+                // Your logic for updating model position, rotation, etc.
+            } else if (modelAdded && results.landmarks.length === 0) {
+                setModelAdded(false);
+            }
+        }
+
+        canvasCtx.restore();
+
+        if (webcamRunning) {
+            window.requestAnimationFrame(predictWebcam);
+        }
+    };
+
     function enableWebcam() {
-        // Your logic for enabling webcam
+        if (webcamRunning) { 
+            return;
+        }
+        // Start webcam and processing
+        const constraints = {
+            video: {
+                facingMode: 'environment' // Use back camera
+            }
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+            if (videoRef.current) {
+                alert('Pochemu ti ne zahodish suda tvarina??');
+                videoRef.current.srcObject = stream;
+                videoRef.current.addEventListener("loadeddata", predictWebcam);
+                setWebcamRunning(true);
+            }
+        }).catch((error) => {
+            console.error("Error accessing webcam:", error);
+        });
     };
 
     function disableWebcam() {
-        // Your logic for disabling webcam
+        if (!webcamRunning) { 
+            return;
+        }
+        // Stop webcam and processing
+        const stream = videoRef.current?.srcObject as MediaStream;
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        if (videoRef.current) {
+            videoRef.current.srcObject = null;
+            videoRef.current.removeEventListener("loadeddata", predictWebcam);
+            setWebcamRunning(false); // Обновляем состояние webcamRunning
+        }
     };
 
     useEffect(() => {
@@ -88,74 +184,15 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
             return;
         }
 
-        const predictWebcam = async () => {
-            const video = document.getElementById("webcam") as HTMLVideoElement;
-            const canvasElement = document.getElementById("output_canvas") as HTMLCanvasElement;
-            const canvasCtx = canvasElement.getContext("2d");
-
-            if (!canvasCtx) {
-                return;
-            }
-
-            if (!handLandmarker || !webcamRunning) {
-                canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                setModelAdded(false);
-                console.log("HandLandmarker is not loaded or webcam is not running.");
-                return;
-            }
-
-            canvasElement.style.width = video.videoWidth + 'px';
-            canvasElement.style.height = video.videoHeight + 'px';
-            canvasElement.width = video.videoWidth;
-            canvasElement.height = video.videoHeight;
-
-            const currentTime = video.currentTime;
-            if (currentTime !== video.currentTime) {
-                setResults(handLandmarker.detectForVideo(video, performance.now()));
-            }
-
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-            if (results && results.landmarks) {
-                for (const landmarks of results.landmarks) {
-                    if (toggleConnectorsCheckboxRef.current?.checked) {
-                        drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
-                            color: "#FFFFFF",
-                            lineWidth: 5
-                        });
-                    }
-                    if (toggleLandmarksCheckboxRef.current?.checked) {
-                        drawLandmarks(canvasCtx, landmarks, {
-                            color: "#00BFFF",
-                            lineWidth: 2
-                        });
-                    }
-                }
-                if (!modelAdded && results.landmarks.length !== 0) {
-                    addModel();
-                    setModelAdded(true);
-                } else if (modelAdded && results.landmarks.length !== 0) {
-                    // Your logic for updating model position, rotation, etc.
-                } else if (modelAdded && results.landmarks.length === 0) {
-                    setModelAdded(false);
-                }
-            }
-
-            canvasCtx.restore();
-
-            if (webcamRunning) {
-                window.requestAnimationFrame(predictWebcam);
-            }
-        };
+        // Проверяем, что videoRef.current определено
+        if (!videoRef.current) {
+            return;
+        }
 
         predictWebcam();
 
         return () => {
             // Cleanup logic
-        };
-
-        function addModel() {
-            // Your logic for adding 3D model
         };
     }, [results, webcamRunning, modelAdded]);
 
