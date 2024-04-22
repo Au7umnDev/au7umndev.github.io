@@ -23,9 +23,10 @@ type Props = {
 function ActionModal({ isOpen, onClose, ring }: Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const streamRef = useRef<any>(null);
     const ringSizeTextBoxRef = useRef<HTMLInputElement>(null);
-    const [connectorsCheckbox, setConnectorsCheckbox] = useState<boolean>(false);
-    const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(false);
+    const [connectorsCheckbox, setConnectorsCheckbox] = useState<boolean>(true);
+    const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(true);
     const [modelMovementCheckbox, setModelMovementCheckbox] = useState<boolean>(false);
     const connectorsCheckboxRef= useRef<HTMLInputElement>(null);
     const landmarksCheckboxRef = useRef<HTMLInputElement>(null);
@@ -194,6 +195,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
 
     function enableWebcam() {
         // Start webcam and processing
+        if(webcamRunning) return;
         const constraints = {
             video: {
                 facingMode: 'environment' // Use back camera
@@ -203,6 +205,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
+                streamRef.current = stream;
                 setWebcamRunning(true);
             }
         }).catch((error) => {
@@ -210,21 +213,20 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         });
     };
 
+    // Stop webcam and processing
     function disableWebcam() {
-        if (!webcamRunning) {
-            return;
-        }
-
-        // Stop webcam and processing
-        const stream = videoRef.current?.srcObject as MediaStream;
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
         if (videoRef.current) {
+            const tracks = streamRef.current.getTracks();
+            console.log(tracks);
+            tracks.forEach(track => track.stop());
             videoRef.current.srcObject = null;
-            videoRef.current.removeEventListener("loadeddata", predictWebcam);
-            setWebcamRunning(false); // Обновляем состояние webcamRunning
-        }
+            setWebcamRunning(false);
+          }
+    };
+
+    const handleCloseModal = () => {
+        disableWebcam();
+        onClose();
     };
 
     useEffect(() => {
@@ -241,6 +243,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
             createHandLandmarker();
         }
         return () => {
+            disableWebcam();
             if (handLandmarker) {
                 handLandmarker.close();
             }
@@ -328,7 +331,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     // }, [results, modelAdded]);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size='full'>
+        <Modal isOpen={isOpen} onClose={handleCloseModal} size='full'>
             <ModalOverlay />
             <ModalContent w='100vh'>
                 <ModalHeader>{ring.name}</ModalHeader>

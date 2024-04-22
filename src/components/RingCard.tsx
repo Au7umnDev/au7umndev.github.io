@@ -42,7 +42,7 @@ function RingCard({ ring }: Props) {
                     <Button width='100%' onClick={openModal}>Подробнее</Button>
                 </CardFooter>
             </Card>
-            <ModalRenderer modalType={'test'} isOpen={isOpen} onClose={onClose} ring={ring} />
+            {isOpen && <ModalRenderer modalType={'test'} isOpen={isOpen} onClose={onClose} ring={ring} />}
         </>
     )
 }
