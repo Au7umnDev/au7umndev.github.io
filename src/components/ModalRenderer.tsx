@@ -21,30 +21,79 @@ type Props = {
 }
 
 function ActionModal({ isOpen, onClose, ring }: Props) {
-    const demosSectionRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const ringSizeTextBoxRef = useRef<HTMLInputElement>(null);
-    const toggleConnectorsCheckboxRef = useRef<HTMLInputElement>(null);
-    const toggleLandmarksCheckboxRef = useRef<HTMLInputElement>(null);
-    const toggleModelMovementCheckboxRef = useRef<HTMLInputElement>(null);
+    const [connectorsCheckbox, setConnectorsCheckbox] = useState<boolean>(false);
+    const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(false);
+    const [modelMovementCheckbox, setModelMovementCheckbox] = useState<boolean>(false);
+    const connectorsCheckboxRef= useRef<HTMLInputElement>(null);
+    const landmarksCheckboxRef = useRef<HTMLInputElement>(null);
+    const modelMovementCheckboxRef = useRef<HTMLInputElement>(null);
     const ringSizeSliderRef = useRef<HTMLInputElement>(null);
 
     const [handLandmarker, setHandLandmarker] = useState<HandLandmarker | null>(null);
     const [webcamRunning, setWebcamRunning] = useState<boolean>(false);
-    const [results, setResults] = useState<any>(null);
+    //const [results, setResults] = useState<any>(null);
     const [modelAdded, setModelAdded] = useState<boolean>(false);
     const [model, setModel] = useState<THREE.Object3D>(new THREE.Object3D());
     const [position14, setPosition14] = useState<any>({});
     const [position13, setPosition13] = useState<any>({});
     const [positionRing, setPositionRing] = useState<any>({});
 
-    function addModel() {
-        // Your logic for adding 3D model
+    const createHandLandmarker = async () => {
+        const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
+        const newHandLandmarker = await HandLandmarker.createFromOptions(vision, {
+            baseOptions: {
+                modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+                delegate: "GPU"
+            },
+            runningMode: "VIDEO",
+            numHands: 2
+        });
+        setHandLandmarker(newHandLandmarker);
     };
 
-    const predictWebcam = async () => {
-        alert('Entered predictWebcam!');
+    // const addModel = () => {
+    //     const scene = new THREE.Scene();
+    //     const renderer = new THREE.WebGLRenderer({ alpha: true });
+    //     renderer.setSize(canvasElement.width, canvasElement.height);
+    //     renderer.domElement.style.position = "absolute";
+    //     renderer.domElement.style.top = "0";
+    //     renderer.domElement.style.left = "0";
+    //     renderer.physicallyCorrectLights = true;
+    //     renderer.outputEncoding = THREE.sRGBEncoding;
+
+    //     document.getElementById("overlay").appendChild(renderer.domElement);
+
+    //     const ambientLight = new THREE.AmbientLight(0xFFFFFF);
+    //     ambientLight.intensity = 2;
+    //     scene.add(ambientLight);
+
+    //     const loader = new GLTFLoader();
+    //     loader.load(
+    //         'app/models/ring_black_and_red.glb',
+    //         function(gltf) {
+    //             model = gltf.scene;
+    //             model.scale.set(0.01, 0.01, 0.01);
+    //             scene.add(model);
+    //         },
+    //         undefined,
+    //         function(error) {
+    //             console.error('An error happened', error);
+    //         }
+    //     );
+
+    //     function animate() {
+    //         requestAnimationFrame(animate);
+    //         renderer.render(scene, camera);
+    //     }
+    //     animate();
+    // };
+
+    const predictWebcam = () => {
+        if (!webcamRunning) return;
+        console.log(new Date().getTime());
 
         const video = videoRef.current;
         const canvasElement = canvasRef.current;
@@ -58,28 +107,38 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
             console.log("HandLandmarker is not loaded or webcam is not running.");
             return;
         }
-    
-        canvasElement.style.width = videoRef.current?.videoWidth + 'px';
-        canvasElement.style.height = videoRef.current?.videoHeight + 'px';
+
         canvasElement.width = videoRef.current?.videoWidth || 0;
         canvasElement.height = videoRef.current?.videoHeight || 0;
+        canvasElement.style.left = `${videoRef.current?.offsetLeft}px`;
+        canvasElement.style.top = `${videoRef.current?.offsetTop}px`;
 
-        const currentTime = videoRef.current?.currentTime || 0;
-        if (currentTime !== videoRef.current?.currentTime) {
-            setResults(handLandmarker.detectForVideo(videoRef.current!, performance.now()));
+        // const currentTime = videoRef.current?.currentTime || 0;
+        let results = null;
+        if (videoRef.current.readyState >= HTMLMediaElement.HAVE_METADATA) {
+            results = handLandmarker.detectForVideo(videoRef.current!, performance.now());
         }
 
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
+        console.log(results);
+
         if (results && results.landmarks) {
-            for (const landmarks of results.landmarks) {
-                if (toggleConnectorsCheckboxRef.current?.checked) {
+            console.log(connectorsCheckbox);
+            
+            for (let landmarks of results.landmarks) {
+                landmarks = landmarks.map(landmark => {
+                    landmark.visibility = 1;
+                    return landmark;
+                })
+                
+                if (connectorsCheckboxRef.current?.checked) {
                     drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
                         color: "#FFFFFF",
                         lineWidth: 5
                     });
                 }
-                if (toggleLandmarksCheckboxRef.current?.checked) {
+                if (landmarksCheckboxRef.current?.checked) {
                     drawLandmarks(canvasCtx, landmarks, {
                         color: "#00BFFF",
                         lineWidth: 2
@@ -87,26 +146,53 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 }
             }
             if (!modelAdded && results.landmarks.length !== 0) {
-                addModel();
+                // addModel();
                 setModelAdded(true);
             } else if (modelAdded && results.landmarks.length !== 0) {
-                // Your logic for updating model position, rotation, etc.
+                //// Приведение к общей системе координат
+                //// Для 0 14
+                position14.x = (results.landmarks[0][14].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
+                position14.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
+                position14.z = -1; // Без Z позиция не копируется
+                //// Для 0 13
+                position13.x = (results.landmarks[0][13].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
+                position13.y = (1 - results.landmarks[0][13].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
+                //// Для кольца
+                positionRing.x = position14.x;
+                if (!modelMovementCheckboxRef.current?.checked) positionRing.y = model.position.y;
+                else positionRing.y = position14.y;
+                positionRing.z = position14.z;
+                ////
+
+                let sliderValue = parseInt(ringSizeSliderRef.current?.value || "0") * 2 / 100;
+                let newScale = results.landmarks[0][0].z * 70000 * sliderValue;
+                //let newScale = results.landmarks[0][0].z * 50000;
+                //ringSizeTextBoxRef.current?.value = newScale;
+                model.scale.set(newScale, newScale, newScale);
+
+                model.position.copy(positionRing);
+                model.visible = true; // Показываем модель
+
+                // Вычисляем угол между горизонтальной прямой и прямой, образованной точками results.landmarks[0][13] и results.landmarks[0][14]
+                let deltaY = position13.y - position14.y;
+                let deltaX = position13.x - position14.x;
+                let angle = Math.atan2(deltaY, deltaX);
+
+                // Преобразуем радианы в градусы и вращаем модель по оси Z
+                let degrees = angle * (180 / Math.PI);
+                //console.log(degrees);
+                model.rotation.z = degrees / 30;
             } else if (modelAdded && results.landmarks.length === 0) {
                 setModelAdded(false);
             }
         }
 
         canvasCtx.restore();
-
-        if (webcamRunning) {
-            window.requestAnimationFrame(predictWebcam);
-        }
+        // console.log("here");
+        window.requestAnimationFrame(predictWebcam);
     };
 
     function enableWebcam() {
-        if (webcamRunning) { 
-            return;
-        }
         // Start webcam and processing
         const constraints = {
             video: {
@@ -114,11 +200,9 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
             }
         };
 
-        navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
             if (videoRef.current) {
-                alert('Pochemu ti ne zahodish suda tvarina??');
                 videoRef.current.srcObject = stream;
-                videoRef.current.addEventListener("loadeddata", predictWebcam);
                 setWebcamRunning(true);
             }
         }).catch((error) => {
@@ -127,9 +211,10 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     };
 
     function disableWebcam() {
-        if (!webcamRunning) { 
+        if (!webcamRunning) {
             return;
         }
+
         // Stop webcam and processing
         const stream = videoRef.current?.srcObject as MediaStream;
         if (stream) {
@@ -143,125 +228,173 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     };
 
     useEffect(() => {
-        const createHandLandmarker = async () => {
-            const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
-            const handLandmarker = await HandLandmarker.createFromOptions(vision, {
-                baseOptions: {
-                    modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
-                    delegate: "GPU"
-                },
-                runningMode: "VIDEO",
-                numHands: 2
-            });
-            setHandLandmarker(handLandmarker);
-            if (demosSectionRef.current) {
-                demosSectionRef.current.classList.remove("invisible");
-            }
-        };
-        createHandLandmarker();
+        if (webcamRunning) {
+            predictWebcam();
+        }
+        return () => {
+            setWebcamRunning(false);
+        }
+    }, [webcamRunning])
 
+    useEffect(() => {
+        if (!handLandmarker) {
+            createHandLandmarker();
+        }
         return () => {
             if (handLandmarker) {
                 handLandmarker.close();
             }
-        };
-    }, []);
+        }
+    }, [])
 
     useEffect(() => {
-        if (webcamRunning) {
-            enableWebcam();
-        } else {
-            disableWebcam();
-        }
+        // const scene = new THREE.Scene();
+        // const renderer = new THREE.WebGLRenderer({ alpha: true });
+        // let camera = undefined;
 
-        return () => {
-            disableWebcam();
-        };
-    }, [webcamRunning]);
+        // if (canvasRef.current) {
+        //     renderer.setSize(canvasRef.current.width, canvasRef.current.height);
+        //     renderer.domElement.style.position = "absolute";
+        //     renderer.domElement.style.top = "0";
+        //     renderer.domElement.style.left = "0";
+        //     renderer.physicallyCorrectLights = true;
+        //     renderer.outputEncoding = THREE.sRGBEncoding;
 
-    useEffect(() => {
-        if (!canvasRef.current || !canvasRef.current.getContext || !toggleConnectorsCheckboxRef.current || !toggleLandmarksCheckboxRef.current || !toggleModelMovementCheckboxRef.current || !ringSizeSliderRef.current) {
-            return;
-        }
+        //     document.getElementById("overlay")?.appendChild(renderer.domElement);
 
-        // Проверяем, что videoRef.current определено
-        if (!videoRef.current) {
-            return;
-        }
+        //     const ambientLight = new THREE.AmbientLight(0xFFFFFF);
+        //     ambientLight.intensity = 2;
+        //     scene.add(ambientLight);
 
-        predictWebcam();
+        //     camera = new THREE.PerspectiveCamera(75, canvasRef.current.width / canvasRef.current.height, 0.1, 1000);
+        //     camera.position.z = 5;
 
-        return () => {
-            // Cleanup logic
-        };
-    }, [results, webcamRunning, modelAdded]);
+        //     const loader = new GLTFLoader();
+        //     loader.load(
+        //         'app/models/ring_black_and_red.glb',
+        //         function(gltf) {
+        //             const loadedModel = gltf.scene;
+        //             loadedModel.scale.set(0.01, 0.01, 0.01);
+        //             scene.add(loadedModel);
+        //             setModel(loadedModel);
+        //         },
+        //         undefined,
+        //         function(error) {
+        //             console.error('An error happened', error);
+        //         }
+        //     );
+
+        //     const animate = () => {
+        //         requestAnimationFrame(animate);
+        //         renderer.render(scene, camera);
+        //     };
+        //     animate();
+        // }
+
+        // return () => {
+        //     if (renderer.domElement) {
+        //         renderer.domElement.remove();
+        //     }
+        // };
+    }, [canvasRef.current]);
+
+    // useEffect(() => {
+    //     if (!webcamRunning) {
+    //         enableWebcam();
+    //     } else {
+    //         disableWebcam();
+    //     }
+
+    //     return () => {
+    //         disableWebcam();
+    //     };
+    // }, [webcamRunning]);
+
+    // useEffect(() => {
+    //     if (!canvasRef.current || !canvasRef.current.getContext || !toggleConnectorsCheckboxRef.current || !toggleLandmarksCheckboxRef.current || !toggleModelMovementCheckboxRef.current || !ringSizeSliderRef.current) {
+    //         return;
+    //     }
+
+    //     // Проверяем, что videoRef.current определено
+    //     if (!videoRef.current) {
+    //         return;
+    //     }
+
+    //     predictWebcam();
+
+    //     return () => {
+    //         // Cleanup logic
+    //     };
+    // }, [results, modelAdded]);
 
     return (
-    <Modal isOpen={isOpen} onClose={onClose} size='full'>
-        <ModalOverlay />
-        <ModalContent w='100vh'>
-            <ModalHeader>{ring.name}</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-                <Tabs variant='soft-rounded' colorScheme='purple'>
-                    <TabList>
-                        <Tab>Описание</Tab>
-                        <Tab>Примерка</Tab>
-                    </TabList>
-                    <TabPanels>
-                        <TabPanel>
-                            <p>one!</p>
-                        </TabPanel>
-                        <TabPanel>
-                            <Flex direction='column'>
-                                <Flex gap={2} direction='column'>
-                                    {/* Video element for displaying webcam output */}
-                                    <video id="webcam" style={{position: 'relative'}} autoPlay playsInline></video>
-                                    <canvas ref={canvasRef} className="output_canvas" id="output_canvas" style={{position: 'absolute', left: '0px', top: '0px'}}></canvas>
-                                    <div id="overlay"></div>
-                                    <FormControl>
-                                        <FormLabel>Настройки</FormLabel>
-                                        <Stack>
-                                            <Checkbox ref={toggleLandmarksCheckboxRef}>Рисовать распознаваемые узлы</Checkbox>
-                                            <Checkbox ref={toggleConnectorsCheckboxRef}>Рисовать связи между узлами</Checkbox>
-                                            <Checkbox ref={toggleModelMovementCheckboxRef}>Заморозить движение кольца по Y координатам</Checkbox>
-                                        </Stack>
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Настройка размера кольца</FormLabel>
-                                        <Slider aria-label='slider-ex-1' defaultValue={30} w='25%' ref={ringSizeSliderRef}>
-                                            <SliderTrack>
-                                                <SliderFilledTrack />
-                                            </SliderTrack>
-                                            <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
-                                        </Slider>
-                                    </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Изменить положение кольца по Y координатам</FormLabel>
-                                        <Slider aria-label='slider-ex-1' defaultValue={30} w='25%'>
-                                            <SliderTrack>
-                                                <SliderFilledTrack />
-                                            </SliderTrack>
-                                            <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
-                                        </Slider>
-                                    </FormControl>
-                                    <Button onClick={enableWebcam}>Примерить</Button>
+        <Modal isOpen={isOpen} onClose={onClose} size='full'>
+            <ModalOverlay />
+            <ModalContent w='100vh'>
+                <ModalHeader>{ring.name}</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                    <Tabs variant='soft-rounded' colorScheme='purple'>
+                        <TabList>
+                            <Tab>Описание</Tab>
+                            <Tab>Примерка</Tab>
+                        </TabList>
+                        <TabPanels>
+                            <TabPanel>
+                                <p>one!</p>
+                            </TabPanel>
+                            <TabPanel>
+                                <Flex direction='column'>
+                                    <Flex gap={2} direction='column'>
+                                        {/* Video element for displaying webcam output */}
+                                        <Flex direction='column' alignItems='center'>
+                                            <video ref={videoRef} autoPlay muted style={{ width: '640px', height: '480px' }} />
+                                            <canvas ref={canvasRef} style={{ position: 'absolute', left: '0px', top: '0px', zIndex: 99999 }}></canvas>
+                                            <div id="overlay"></div>
+                                        </Flex>
+                                        <FormControl>
+                                            <FormLabel>Настройки</FormLabel>
+                                            <Stack>
+                                                <Checkbox ref={landmarksCheckboxRef} isChecked={landmarksCheckbox} onChange={() => setLandmarksCheckbox(prev => !prev)}>Рисовать распознаваемые узлы</Checkbox>
+                                                <Checkbox ref={connectorsCheckboxRef} isChecked={connectorsCheckbox} onChange={() => setConnectorsCheckbox(prev => !prev)}>Рисовать связи между узлами</Checkbox>
+                                                <Checkbox ref={modelMovementCheckboxRef} isChecked={modelMovementCheckbox} onChange={() => setModelMovementCheckbox(prev => !prev)}>Заморозить движение кольца по Y координатам</Checkbox>
+                                            </Stack>
+                                        </FormControl>
+                                        <FormControl>
+                                            <FormLabel>Настройка размера кольца</FormLabel>
+                                            <Slider aria-label='slider-ex-1' defaultValue={30} w='25%' ref={ringSizeSliderRef}>
+                                                <SliderTrack>
+                                                    <SliderFilledTrack />
+                                                </SliderTrack>
+                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
+                                            </Slider>
+                                        </FormControl>
+                                        <FormControl>
+                                            <FormLabel>Изменить положение кольца по Y координатам</FormLabel>
+                                            <Slider aria-label='slider-ex-1' defaultValue={30} w='25%'>
+                                                <SliderTrack>
+                                                    <SliderFilledTrack />
+                                                </SliderTrack>
+                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
+                                            </Slider>
+                                        </FormControl>
+                                        <Button onClick={enableWebcam}>Примерить</Button>
+                                    </Flex>
+                                    <Flex flexDirection='column' gap={2}>
+                                        {/* Other components */}
+                                    </Flex>
                                 </Flex>
-                                <Flex flexDirection='column' gap={2}>
-                                    {/* Other components */}
-                                </Flex>
-                            </Flex>
-                        </TabPanel>
-                    </TabPanels>
-                </Tabs>
-            </ModalBody>
-            <ModalFooter>
-                <Button colorScheme='red' mr={3} onClick={onClose}>
-                    Закрыть
-                </Button>
-            </ModalFooter>
-        </ModalContent>
-    </Modal>
+                            </TabPanel>
+                        </TabPanels>
+                    </Tabs>
+                </ModalBody>
+                <ModalFooter>
+                    <Button colorScheme='red' mr={3} onClick={onClose}>
+                        Закрыть
+                    </Button>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
     );
 }
 
