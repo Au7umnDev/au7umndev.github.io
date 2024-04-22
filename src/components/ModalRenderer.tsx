@@ -5,6 +5,8 @@ import { HandLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { HAND_CONNECTIONS } from '@mediapipe/holistic';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { ringModelAtom } from '../atomStorage';
+import { useAtom } from 'jotai';
 
 type Ring = {
     name: string,
@@ -24,23 +26,22 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<any>(null);
-    const ringSizeTextBoxRef = useRef<HTMLInputElement>(null);
+    const overlayRef = useRef<HTMLDivElement>(null);
     const [connectorsCheckbox, setConnectorsCheckbox] = useState<boolean>(true);
     const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(true);
     const [modelMovementCheckbox, setModelMovementCheckbox] = useState<boolean>(false);
-    const connectorsCheckboxRef= useRef<HTMLInputElement>(null);
+    const connectorsCheckboxRef = useRef<HTMLInputElement>(null);
     const landmarksCheckboxRef = useRef<HTMLInputElement>(null);
     const modelMovementCheckboxRef = useRef<HTMLInputElement>(null);
     const ringSizeSliderRef = useRef<HTMLInputElement>(null);
 
     const [handLandmarker, setHandLandmarker] = useState<HandLandmarker | null>(null);
     const [webcamRunning, setWebcamRunning] = useState<boolean>(false);
-    //const [results, setResults] = useState<any>(null);
-    const [modelAdded, setModelAdded] = useState<boolean>(false);
-    const [model, setModel] = useState<THREE.Object3D>(new THREE.Object3D());
+    const [modelAdded, setModelAdded] = useState<boolean>(true);
+    const [model, setModel] = useAtom(ringModelAtom);
     const [position14, setPosition14] = useState<any>({});
     const [position13, setPosition13] = useState<any>({});
-    const [positionRing, setPositionRing] = useState<any>({});
+    const [positionRingState, setPositionRingState] = useState<any>({});
 
     const createHandLandmarker = async () => {
         const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
@@ -55,46 +56,53 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         setHandLandmarker(newHandLandmarker);
     };
 
-    // const addModel = () => {
-    //     const scene = new THREE.Scene();
-    //     const renderer = new THREE.WebGLRenderer({ alpha: true });
-    //     renderer.setSize(canvasElement.width, canvasElement.height);
-    //     renderer.domElement.style.position = "absolute";
-    //     renderer.domElement.style.top = "0";
-    //     renderer.domElement.style.left = "0";
-    //     renderer.physicallyCorrectLights = true;
-    //     renderer.outputEncoding = THREE.sRGBEncoding;
+    const addModel = () => {
+        const scene = new THREE.Scene();
+        const renderer = new THREE.WebGLRenderer({ alpha: true }); // Добавил атрибут alpha для поддержки прозрачности
+        const camera = new THREE.PerspectiveCamera(20, 640 / 480, 0.1, 1000); // Инициализация объекта camera
+        camera.position.z = 2;
 
-    //     document.getElementById("overlay").appendChild(renderer.domElement);
+        // canvasRef.current!.width / canvasRef.current!.height
+        
+        renderer.setSize(640, 480);
+        renderer.domElement.style.position = "absolute";
+        renderer.domElement.style.top = `${videoRef.current?.offsetTop}px`;
+        renderer.domElement.style.left = `${videoRef.current?.offsetLeft}px`;
+        renderer.domElement.width = 640;
+        renderer.domElement.height = 480;
+        renderer.outputColorSpace = THREE.SRGBColorSpace; // Добавил атрибут для корректного отображения цветов
 
-    //     const ambientLight = new THREE.AmbientLight(0xFFFFFF);
-    //     ambientLight.intensity = 2;
-    //     scene.add(ambientLight);
+        overlayRef.current!.appendChild(renderer.domElement);
 
-    //     const loader = new GLTFLoader();
-    //     loader.load(
-    //         'app/models/ring_black_and_red.glb',
-    //         function(gltf) {
-    //             model = gltf.scene;
-    //             model.scale.set(0.01, 0.01, 0.01);
-    //             scene.add(model);
-    //         },
-    //         undefined,
-    //         function(error) {
-    //             console.error('An error happened', error);
-    //         }
-    //     );
+        const ambientLight = new THREE.AmbientLight(0xFFFFFF);
+        ambientLight.intensity = 2;
+        scene.add(ambientLight);
 
-    //     function animate() {
-    //         requestAnimationFrame(animate);
-    //         renderer.render(scene, camera);
-    //     }
-    //     animate();
-    // };
+        const loader = new GLTFLoader();
+        loader.load(
+            ring.modelPath,
+            function (gltf) {
+                const loadedModel = gltf.scene;
+                loadedModel.scale.set(0.01, 0.01, 0.01);
+                scene.add(loadedModel);
+                setModel(loadedModel); // Использование локального состояния model вместо переменной model
+            },
+            undefined,
+            function (error) {
+                console.error('An error happened', error);
+            }
+        );
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+    };
 
     const predictWebcam = () => {
         if (!webcamRunning) return;
-        console.log(new Date().getTime());
+        // console.log(new Date().getTime());
 
         const video = videoRef.current;
         const canvasElement = canvasRef.current;
@@ -122,17 +130,17 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
 
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-        console.log(results);
+        // console.log(results);
 
         if (results && results.landmarks) {
-            console.log(connectorsCheckbox);
-            
+            // console.log(connectorsCheckbox);
+
             for (let landmarks of results.landmarks) {
                 landmarks = landmarks.map(landmark => {
                     landmark.visibility = 1;
                     return landmark;
                 })
-                
+
                 if (connectorsCheckboxRef.current?.checked) {
                     drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
                         color: "#FFFFFF",
@@ -147,9 +155,12 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 }
             }
             if (!modelAdded && results.landmarks.length !== 0) {
-                // addModel();
-                setModelAdded(true);
+
             } else if (modelAdded && results.landmarks.length !== 0) {
+                let position14: any = {};
+                let position13: any = {};
+                let positionRing: any = {};
+                
                 //// Приведение к общей системе координат
                 //// Для 0 14
                 position14.x = (results.landmarks[0][14].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
@@ -160,18 +171,40 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 position13.y = (1 - results.landmarks[0][13].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
                 //// Для кольца
                 positionRing.x = position14.x;
-                if (!modelMovementCheckboxRef.current?.checked) positionRing.y = model.position.y;
+                if (modelMovementCheckboxRef.current?.checked) positionRing.y = model.position.y;
                 else positionRing.y = position14.y;
                 positionRing.z = position14.z;
                 ////
 
-                let sliderValue = parseInt(ringSizeSliderRef.current?.value || "0") * 2 / 100;
-                let newScale = results.landmarks[0][0].z * 70000 * sliderValue;
+                console.log(positionRing)
+
+                // let sliderValue = parseInt(ringSizeSliderRef.current?.value || "0") * 2 / 100;
+                let newScale = results.landmarks[0][0].z * 70000 /** sliderValue*/;
                 //let newScale = results.landmarks[0][0].z * 50000;
                 //ringSizeTextBoxRef.current?.value = newScale;
                 model.scale.set(newScale, newScale, newScale);
 
-                model.position.copy(positionRing);
+                //model.position.copy(positionRing);
+                //model.position.set(positionRing.x, positionRing.y, positionRing.z);
+
+                // model.position.x = positionRing.x;
+                // model.position.y = positionRing.y;
+                // model.position.z = positionRing.z;
+ 
+                // setModel(prev => model);
+
+                // setModel(prevModel => {
+                //     const updatedModel = prevModel.clone(); // Клонируем предыдущий объект model
+                //     updatedModel.position.set(positionRing.x, positionRing.y, positionRing.z); // Устанавливаем новые координаты позиции
+                //     return updatedModel; // Возвращаем обновленный объект model
+                // });
+
+                // setModel(new THREE.Object3D().copy(model).position.set(positionRing.x, positionRing.y, positionRing.z));
+
+                // const updatedModel = model.clone(); // Создаем копию существующего объекта model
+                // updatedModel.position.set(positionRing.x, positionRing.y, positionRing.z); // Устанавливаем новые координаты позиции
+                // setModel(updatedModel);
+
                 model.visible = true; // Показываем модель
 
                 // Вычисляем угол между горизонтальной прямой и прямой, образованной точками results.landmarks[0][13] и results.landmarks[0][14]
@@ -183,6 +216,15 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 let degrees = angle * (180 / Math.PI);
                 //console.log(degrees);
                 model.rotation.z = degrees / 30;
+
+                setModel(prevModel => {
+                    const updatedModel = Object.assign({}, prevModel); // Создаем копию предыдущего объекта model
+                    updatedModel.position.set(positionRing.x, positionRing.y, positionRing.z);
+                    updatedModel.scale.set(newScale, newScale, newScale); // Устанавливаем новые координаты позиции
+                    updatedModel.rotation.z = degrees / 30; // Устанавливаем новые координаты позиции
+                    return updatedModel; // Возвращаем обновленный объект model
+                });
+                
             } else if (modelAdded && results.landmarks.length === 0) {
                 setModelAdded(false);
             }
@@ -195,14 +237,14 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
 
     function enableWebcam() {
         // Start webcam and processing
-        if(webcamRunning) return;
+        if (webcamRunning) return;
         const constraints = {
             video: {
                 facingMode: 'environment' // Use back camera
             }
         };
 
-        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+        navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
                 streamRef.current = stream;
@@ -221,7 +263,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
             tracks.forEach(track => track.stop());
             videoRef.current.srcObject = null;
             setWebcamRunning(false);
-          }
+        }
     };
 
     const handleCloseModal = () => {
@@ -232,6 +274,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     useEffect(() => {
         if (webcamRunning) {
             predictWebcam();
+            addModel();
         }
         return () => {
             setWebcamRunning(false);
@@ -352,8 +395,8 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                         {/* Video element for displaying webcam output */}
                                         <Flex direction='column' alignItems='center'>
                                             <video ref={videoRef} autoPlay muted style={{ width: '640px', height: '480px' }} />
-                                            <canvas ref={canvasRef} style={{ position: 'absolute', left: '0px', top: '0px', zIndex: 99999 }}></canvas>
-                                            <div id="overlay"></div>
+                                            <canvas ref={canvasRef} style={{ position: 'absolute', left: '0px', top: '0px', zIndex: 99998 }}></canvas>
+                                            <div ref={overlayRef} style={{ position: 'absolute', left: '0px', top: '0px', zIndex: 99999 }}></div>
                                         </Flex>
                                         <FormControl>
                                             <FormLabel>Настройки</FormLabel>

@@ -6,7 +6,7 @@ const ringsRepository = [
     {
         name: 'ring_black_and_red 1',
         imageSrc: 'google.com',
-        modelPath: 'app/models/ring_black_and_red.glb',
+        modelPath: 'src/models/ring_black_and_red.glb',
         description: 'asdasd'
     },
 ]
