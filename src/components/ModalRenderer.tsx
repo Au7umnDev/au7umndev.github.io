@@ -37,11 +37,11 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
 
     const [handLandmarker, setHandLandmarker] = useState<HandLandmarker | null>(null);
     const [webcamRunning, setWebcamRunning] = useState<boolean>(false);
-    const [modelAdded, setModelAdded] = useState<boolean>(true);
+    const [modelAdded, setModelAdded] = useState<boolean>(false);
     const [model, setModel] = useAtom(ringModelAtom);
-    const [position14, setPosition14] = useState<any>({});
-    const [position13, setPosition13] = useState<any>({});
-    const [positionRingState, setPositionRingState] = useState<any>({});
+    // const [position14, setPosition14] = useState<any>({});
+    // const [position13, setPosition13] = useState<any>({});
+    // const [positionRingState, setPositionRingState] = useState<any>({});
 
     const createHandLandmarker = async () => {
         const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
@@ -51,7 +51,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 delegate: "GPU"
             },
             runningMode: "VIDEO",
-            numHands: 2
+            numHands: 1
         });
         setHandLandmarker(newHandLandmarker);
     };
@@ -81,13 +81,16 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         const loader = new GLTFLoader();
         loader.load(
             ring.modelPath,
+
             function (gltf) {
                 const loadedModel = gltf.scene;
-                loadedModel.scale.set(0.01, 0.01, 0.01);
+                loadedModel.scale.set(0, 0, 0);
+                loadedModel.name = 'Ring';
                 scene.add(loadedModel);
                 setModel(loadedModel); // Использование локального состояния model вместо переменной model
             },
             undefined,
+
             function (error) {
                 console.error('An error happened', error);
             }
@@ -154,9 +157,10 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                     });
                 }
             }
-            if (!modelAdded && results.landmarks.length !== 0) {
 
-            } else if (modelAdded && results.landmarks.length !== 0) {
+            if (results.landmarks.length !== 0) {
+                setModelAdded(true); // Если модель еще не добавлена и есть landmarks, установим modelAdded в true
+
                 let position14: any = {};
                 let position13: any = {};
                 let positionRing: any = {};
@@ -176,36 +180,11 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 positionRing.z = position14.z;
                 ////
 
-                console.log(positionRing)
-
                 // let sliderValue = parseInt(ringSizeSliderRef.current?.value || "0") * 2 / 100;
                 let newScale = results.landmarks[0][0].z * 70000 /** sliderValue*/;
                 //let newScale = results.landmarks[0][0].z * 50000;
                 //ringSizeTextBoxRef.current?.value = newScale;
                 model.scale.set(newScale, newScale, newScale);
-
-                //model.position.copy(positionRing);
-                //model.position.set(positionRing.x, positionRing.y, positionRing.z);
-
-                // model.position.x = positionRing.x;
-                // model.position.y = positionRing.y;
-                // model.position.z = positionRing.z;
- 
-                // setModel(prev => model);
-
-                // setModel(prevModel => {
-                //     const updatedModel = prevModel.clone(); // Клонируем предыдущий объект model
-                //     updatedModel.position.set(positionRing.x, positionRing.y, positionRing.z); // Устанавливаем новые координаты позиции
-                //     return updatedModel; // Возвращаем обновленный объект model
-                // });
-
-                // setModel(new THREE.Object3D().copy(model).position.set(positionRing.x, positionRing.y, positionRing.z));
-
-                // const updatedModel = model.clone(); // Создаем копию существующего объекта model
-                // updatedModel.position.set(positionRing.x, positionRing.y, positionRing.z); // Устанавливаем новые координаты позиции
-                // setModel(updatedModel);
-
-                model.visible = true; // Показываем модель
 
                 // Вычисляем угол между горизонтальной прямой и прямой, образованной точками results.landmarks[0][13] и results.landmarks[0][14]
                 let deltaY = position13.y - position14.y;
@@ -213,20 +192,18 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 let angle = Math.atan2(deltaY, deltaX);
 
                 // Преобразуем радианы в градусы и вращаем модель по оси Z
-                let degrees = angle * (180 / Math.PI);
-                //console.log(degrees);
-                model.rotation.z = degrees / 30;
+                let degrees = (angle * 180 / Math.PI + 360) % 360;
+                // console.log(degrees);
 
                 setModel(prevModel => {
                     const updatedModel = Object.assign({}, prevModel); // Создаем копию предыдущего объекта model
                     updatedModel.position.set(positionRing.x, positionRing.y, positionRing.z);
                     updatedModel.scale.set(newScale, newScale, newScale); // Устанавливаем новые координаты позиции
-                    updatedModel.rotation.z = degrees / 30; // Устанавливаем новые координаты позиции
+                    updatedModel.rotation.z = (degrees * Math.PI / 180) + 80; // Устанавливаем новые координаты позиции. Пока сам понятия не имею почему именно + 80, но пусть будет
                     return updatedModel; // Возвращаем обновленный объект model
                 });
-                
-            } else if (modelAdded && results.landmarks.length === 0) {
-                setModelAdded(false);
+            } else {
+                setModelAdded(false); // Если модель уже добавлена, но landmarks отсутствуют, установим modelAdded в false
             }
         }
 
@@ -259,7 +236,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     function disableWebcam() {
         if (videoRef.current) {
             const tracks = streamRef.current.getTracks();
-            console.log(tracks);
+            // console.log(tracks);
             tracks.forEach(track => track.stop());
             videoRef.current.srcObject = null;
             setWebcamRunning(false);
@@ -267,7 +244,9 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     };
 
     const handleCloseModal = () => {
-        disableWebcam();
+        if(streamRef.current)
+            disableWebcam();
+
         onClose();
     };
 
@@ -344,34 +323,14 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         // };
     }, [canvasRef.current]);
 
-    // useEffect(() => {
-    //     if (!webcamRunning) {
-    //         enableWebcam();
-    //     } else {
-    //         disableWebcam();
-    //     }
-
-    //     return () => {
-    //         disableWebcam();
-    //     };
-    // }, [webcamRunning]);
-
-    // useEffect(() => {
-    //     if (!canvasRef.current || !canvasRef.current.getContext || !toggleConnectorsCheckboxRef.current || !toggleLandmarksCheckboxRef.current || !toggleModelMovementCheckboxRef.current || !ringSizeSliderRef.current) {
-    //         return;
-    //     }
-
-    //     // Проверяем, что videoRef.current определено
-    //     if (!videoRef.current) {
-    //         return;
-    //     }
-
-    //     predictWebcam();
-
-    //     return () => {
-    //         // Cleanup logic
-    //     };
-    // }, [results, modelAdded]);
+    useEffect(() => {
+        if (!modelAdded) {
+            if (model) {
+                model.scale.set(0, 0, 0);
+                setModel(model);
+            }
+        }
+    }, [modelAdded]);
 
     return (
         <Modal isOpen={isOpen} onClose={handleCloseModal} size='full'>
@@ -435,7 +394,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                     </Tabs>
                 </ModalBody>
                 <ModalFooter>
-                    <Button colorScheme='red' mr={3} onClick={onClose}>
+                    <Button colorScheme='red' mr={3} onClick={handleCloseModal}>
                         Закрыть
                     </Button>
                 </ModalFooter>
