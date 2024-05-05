@@ -26,19 +26,29 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
     const streamRef = useRef<any>(null);
+    const cameraRef = useRef<any>(null);
+    const ringPosRef = useRef<any>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
-    const [connectorsCheckbox, setConnectorsCheckbox] = useState<boolean>(true);
-    const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(true);
-    const [modelMovementCheckbox, setModelMovementCheckbox] = useState<boolean>(false);
+    const [connectorsCheckbox, setConnectorsCheckbox] = useState<boolean>(false);
+    const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(false);
     const connectorsCheckboxRef = useRef<HTMLInputElement>(null);
     const landmarksCheckboxRef = useRef<HTMLInputElement>(null);
-    const modelMovementCheckboxRef = useRef<HTMLInputElement>(null);
-    const ringSizeSliderRef = useRef<HTMLInputElement>(null);
+    // const modelMovementCheckboxRef = useRef<HTMLInputElement>(null);
+    // const [modelMovementCheckbox, setModelMovementCheckbox] = useState<boolean>(false);
+    // const ringSizeSliderRef = useRef<HTMLInputElement>(null);
+    // const cameraXpositionSliderRef = useRef<HTMLInputElement>(null);
+    // const cameraYpositionSliderRef = useRef<HTMLInputElement>(null);
+    // const cameraZpositionSliderRef = useRef<HTMLInputElement>(null);
+    // const ringZpositionSliderRef = useRef<HTMLInputElement>(null);
 
     const [handLandmarker, setHandLandmarker] = useState<HandLandmarker | null>(null);
     const [webcamRunning, setWebcamRunning] = useState<boolean>(false);
     const [modelAdded, setModelAdded] = useState<boolean>(false);
     const [model, setModel] = useAtom(ringModelAtom);
+    // const [ringZPosition, setRingZPosition] = useState<number>(-1);
+    // const [cameraXPosition, setCameraXPosition] = useState<number>(0);
+    // const [cameraYPosition, setCameraYPosition] = useState<number>(0);
+    // const [cameraZPosition, setCameraZPosition] = useState<number>(3);
     // const [position14, setPosition14] = useState<any>({});
     // const [position13, setPosition13] = useState<any>({});
     // const [positionRingState, setPositionRingState] = useState<any>({});
@@ -61,7 +71,8 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         const scene = new THREE.Scene();
         const renderer = new THREE.WebGLRenderer({ alpha: true }); // Добавил атрибут alpha для поддержки прозрачности
         const camera = new THREE.PerspectiveCamera(20, 640 / 480, 0.1, 1000); // Инициализация объекта camera
-        camera.position.z = 2;
+        camera.position.z = 3;
+        cameraRef.current = camera;
 
         // canvasRef.current!.width / canvasRef.current!.height
         
@@ -167,19 +178,27 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 let positionRing: any = {};
                 
                 //// Приведение к общей системе координат
-                //// Для 0 14
+                //// Для фаланги после костяшки
                 position14.x = (results.landmarks[0][14].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
                 position14.y = (1 - results.landmarks[0][14].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
                 position14.z = -1; // Без Z позиция не копируется
-                //// Для 0 13
+                //// Для костяшки
                 position13.x = (results.landmarks[0][13].x) * 2 - 1; // Преобразование x в диапазон [-1, 1]
                 position13.y = (1 - results.landmarks[0][13].y) * 2 - 1; // Преобразование y в диапазон [-1, 1]
                 //// Для кольца
-                positionRing.x = position14.x;
-                if (modelMovementCheckboxRef.current?.checked) positionRing.y = model.position.y;
-                else positionRing.y = position14.y;
+                positionRing.x = (position14.x + position13.x) / 2;
+                positionRing.y = (position14.y + position13.y) / 2;
                 positionRing.z = position14.z;
                 ////
+
+                // console.log(position14.y, position13.y);
+
+                ringPosRef.current = positionRing;
+                // console.log(ringPosRef.current.z)
+                // console.log(ringPosRef.current.x, ringPosRef.current.y, ringPosRef.current.z);
+                cameraRef.current.position.x = positionRing.x * 0.08;
+                cameraRef.current.position.y = positionRing.y * 0.3;
+                // console.log(cameraRef.current.position.x, cameraRef.current.position.y);
 
                 // let sliderValue = parseInt(ringSizeSliderRef.current?.value || "0") * 2 / 100;
                 let newScale = results.landmarks[0][0].z * 70000 /** sliderValue*/;
@@ -191,14 +210,14 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                 let deltaY = position13.y - position14.y;
                 let deltaX = position13.x - position14.x;
                 let angle = Math.atan2(deltaY, deltaX);
-
+                
                 // Преобразуем радианы в градусы и вращаем модель по оси Z
                 let degrees = (angle * 180 / Math.PI + 360) % 360;
                 // console.log(degrees);
 
                 setModel(prevModel => {
                     const updatedModel = Object.assign({}, prevModel); // Создаем копию предыдущего объекта model
-                    updatedModel.position.set(positionRing.x, positionRing.y, positionRing.z);
+                    updatedModel.position.set(ringPosRef.current.x, ringPosRef.current.y, ringPosRef.current.z);
                     updatedModel.scale.set(newScale, newScale, newScale); // Устанавливаем новые координаты позиции
                     updatedModel.rotation.z = (degrees * Math.PI / 180) + 80; // Устанавливаем новые координаты позиции. Пока сам понятия не имею почему именно + 80, но пусть будет
                     return updatedModel; // Возвращаем обновленный объект model
@@ -209,7 +228,6 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         }
 
         canvasCtx.restore();
-        // console.log("here");
         window.requestAnimationFrame(predictWebcam);
     };
 
@@ -333,6 +351,20 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         }
     }, [modelAdded]);
 
+    // useEffect(() => {
+    //     if (cameraRef.current) {
+    //         cameraRef.current.position.x = cameraXPosition;
+    //         cameraRef.current.position.y = cameraYPosition;
+    //         cameraRef.current.position.z = cameraZPosition;
+    //     }
+    // }, [cameraZPosition, cameraYPosition, cameraXPosition]);
+
+    // useEffect(() => {
+    //     if (ringPosRef.current) {
+    //         ringPosRef.current.z = ringZPosition;
+    //     }
+    // }, [ringZPosition]);
+
     return (
         <Modal isOpen={isOpen} onClose={handleCloseModal} size='full'>
             <ModalOverlay />
@@ -363,10 +395,10 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                             <Stack>
                                                 <Checkbox ref={landmarksCheckboxRef} isChecked={landmarksCheckbox} onChange={() => setLandmarksCheckbox(prev => !prev)}>Рисовать распознаваемые узлы</Checkbox>
                                                 <Checkbox ref={connectorsCheckboxRef} isChecked={connectorsCheckbox} onChange={() => setConnectorsCheckbox(prev => !prev)}>Рисовать связи между узлами</Checkbox>
-                                                <Checkbox ref={modelMovementCheckboxRef} isChecked={modelMovementCheckbox} onChange={() => setModelMovementCheckbox(prev => !prev)}>Заморозить движение кольца по Y координатам</Checkbox>
+                                                {/* <Checkbox ref={modelMovementCheckboxRef} isChecked={modelMovementCheckbox} onChange={() => setModelMovementCheckbox(prev => !prev)}>Заморозить движение кольца по Y координатам</Checkbox> */}
                                             </Stack>
                                         </FormControl>
-                                        <FormControl>
+                                        {/* <FormControl>
                                             <FormLabel>Настройка размера кольца</FormLabel>
                                             <Slider aria-label='slider-ex-1' defaultValue={30} w='25%' ref={ringSizeSliderRef}>
                                                 <SliderTrack>
@@ -384,10 +416,43 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                                 <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
                                             </Slider>
                                         </FormControl>
+                                        <FormControl>
+                                            <FormLabel>Изменить положение кольца по Z координатам: {ringZPosition}</FormLabel>
+                                            <Slider aria-label='slider-ex-1' defaultValue={-1} min={-10} max={10} step={0.5} w='25%' ref={ringZpositionSliderRef} onChange={(value) => {setRingZPosition(value);}}>
+                                                <SliderTrack>
+                                                    <SliderFilledTrack />
+                                                </SliderTrack>
+                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
+                                            </Slider>
+                                        </FormControl>
+                                        <FormControl>
+                                            <FormLabel>Изменить положение камеры по X координатам: {cameraXPosition}</FormLabel>
+                                            <Slider aria-label='slider-ex-1' defaultValue={0} min={-1} max={1} step={0.1} w='25%' ref={cameraXpositionSliderRef} onChange={(value) => {setCameraXPosition(value);}}>
+                                                <SliderTrack>
+                                                    <SliderFilledTrack />
+                                                </SliderTrack>
+                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
+                                            </Slider>
+                                        </FormControl>
+                                        <FormControl>
+                                            <FormLabel>Изменить положение камеры по Y координатам: {cameraYPosition}</FormLabel>
+                                            <Slider aria-label='slider-ex-1' defaultValue={0} min={-1} max={1} step={0.1} w='25%' ref={cameraYpositionSliderRef} onChange={(value) => {setCameraYPosition(value);}}>
+                                                <SliderTrack>
+                                                    <SliderFilledTrack />
+                                                </SliderTrack>
+                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
+                                            </Slider>
+                                        </FormControl>
+                                        <FormControl>
+                                            <FormLabel>Изменить положение камеры по Z координатам: {cameraZPosition}</FormLabel>
+                                            <Slider aria-label='slider-ex-1' defaultValue={3} min={-10} max={10} step={0.5} w='25%' ref={cameraZpositionSliderRef} onChange={(value) => {setCameraZPosition(value);}}>
+                                                <SliderTrack>
+                                                    <SliderFilledTrack />
+                                                </SliderTrack>
+                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
+                                            </Slider>
+                                        </FormControl> */}
                                         <Button onClick={enableWebcam}>Примерить</Button>
-                                    </Flex>
-                                    <Flex flexDirection='column' gap={2}>
-                                        {/* Other components */}
                                     </Flex>
                                 </Flex>
                             </TabPanel>
