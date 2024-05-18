@@ -1,11 +1,13 @@
 import { Button, ButtonGroup, Card, CardBody, CardFooter, CardHeader, Divider, Heading, Image, Stack, Text, useDisclosure } from '@chakra-ui/react'
+import { Carousel } from 'react-responsive-carousel';
 import React, { useState } from 'react'
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import ModalRenderer from './ModalRenderer'
 
 
 type Ring = {
     name: string,
-    imageSrc: string,
+    imageSrc: string[],
     modelPath: string,
     description: string
 }
@@ -23,13 +25,15 @@ function RingCard({ ring }: Props) {
       }
     return (
         <>
-            <Card>
+            <Card ml="20px" mr="20px" mt="20px" mb="20px">
                 <CardBody>
-                    <Image
-                        src='https://www.dummyimage.co.uk/256x256/cbcbcb/959595/Dummy%20Image/40'
-                        alt='Green double couch with wooden legs'
-                        borderRadius='lg'
-                    />
+                    <Carousel showThumbs={false} showStatus={false} infiniteLoop useKeyboardArrows swipeable emulateTouch>
+                        {ring.imageSrc.map((src, index) => (
+                            <div key={index}>
+                                <img src={src} alt={`Image ${index + 1}`} style={{ width: 'auto', height: 'auto', borderRadius: 'lg' }} />
+                            </div>
+                        ))}
+                    </Carousel>
                     <Stack mt='6' spacing='3'>
                         <Heading size='md'>{ring.name}</Heading>
                         <Text>

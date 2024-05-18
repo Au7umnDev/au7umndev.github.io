@@ -1,6 +1,7 @@
-import { Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, HStack, FormControl, FormHelperText, FormLabel, Input, Checkbox, Stack, Hide, Slider, SliderFilledTrack, SliderThumb, SliderTrack, Box } from '@chakra-ui/react'
+import { Text, Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, HStack, FormControl, FormHelperText, FormLabel, Input, Checkbox, Stack, Hide, Slider, SliderFilledTrack, SliderThumb, SliderTrack, Box } from '@chakra-ui/react'
 import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three';
+import { Carousel } from 'react-responsive-carousel';
 import { HandLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { HAND_CONNECTIONS } from '@mediapipe/holistic';
@@ -10,9 +11,10 @@ import { useAtom } from 'jotai';
 
 type Ring = {
     name: string,
-    imageSrc: string,
+    imageSrc: string[],
     modelPath: string,
-    description: string
+    description: string,
+    totalDescription: string,
 }
 
 type Props = {
@@ -45,6 +47,8 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     const [webcamRunning, setWebcamRunning] = useState<boolean>(false);
     const [modelAdded, setModelAdded] = useState<boolean>(false);
     const [model, setModel] = useAtom(ringModelAtom);
+    const [showInstruction, setShowInstruction] = useState(true);
+    const [showImage, setShowImage] = useState(true);
     // const [ringZPosition, setRingZPosition] = useState<number>(-1);
     // const [cameraXPosition, setCameraXPosition] = useState<number>(0);
     // const [cameraYPosition, setCameraYPosition] = useState<number>(0);
@@ -234,6 +238,10 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     function enableWebcam() {
         // Start webcam and processing
         if (webcamRunning) return;
+
+        setShowInstruction(false);
+        setShowImage(false);
+
         const constraints = {
             video: {
                 facingMode: 'environment' // Use back camera
@@ -379,15 +387,29 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                         </TabList>
                         <TabPanels>
                             <TabPanel>
-                                <p>one!</p>
+                                <Carousel showThumbs={false} showStatus={false} infiniteLoop useKeyboardArrows swipeable emulateTouch>
+                                    {ring.imageSrc.map((src, index) => (
+                                        <div key={index}>
+                                            <img src={src} alt={`Image ${index + 1}`} style={{ width: 'auto', height: 'auto', borderRadius: 'lg' }} />
+                                        </div>
+                                    ))}
+                                </Carousel>
+                                <Flex justify='center' align='center' p={4} bg='purple.100' color='purple.800' borderRadius='md' fontWeight='bold' mt={4}>
+                                Это кольцо можно примерить с помощью дополненной реальности! Перейдите во вкладку "Примерка".
+                                </Flex>
+                                <Text mt="10px" fontSize="lg" textAlign="justify" fontStyle="italic" color="gray.900">
+                                    {ring.totalDescription}
+                                </Text>
                             </TabPanel>
                             <TabPanel>
                                 <Flex direction='column'>
                                     <Flex gap={2} direction='column'>
-                                        {/* Video element for displaying webcam output */}
                                         <Flex direction='column' alignItems='center'>
+                                            {showImage && (
+                                            <Image src={'/src/img/no_camera.jpg'} alt="Waiting for camera..." style={{ position: 'absolute', width: '640px', height: '480px', zIndex: 99995 }}/>
+                                            )}
                                             <video ref={videoRef} autoPlay muted style={{ width: '640px', height: '480px' }} />
-                                            <canvas ref={canvasRef} style={{ position: 'absolute', left: '0px', top: '0px', zIndex: 99998 }}></canvas>
+                                            <canvas ref={canvasRef} style={{ pointerEvents: 'none', position: 'absolute', left: '0px', top: '0px', zIndex: 99998 }}></canvas>
                                             <div ref={overlayRef} style={{ position: 'absolute', left: '0px', top: '0px', zIndex: 99999 }}></div>
                                         </Flex>
                                         <FormControl>
@@ -453,6 +475,11 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                             </Slider>
                                         </FormControl> */}
                                         <Button onClick={enableWebcam}>Примерить</Button>
+                                        { showInstruction && (
+                                        <Flex justify='center' align='center' p={4} bg='purple.100' color='purple.800' borderRadius='md' fontWeight='bold' mt={4}>
+                                        Чтобы начать примерку кольца на палец с применением вашей камеры, нажмите на кнопку "Примерить".
+                                        </Flex>
+                                        )}
                                     </Flex>
                                 </Flex>
                             </TabPanel>
