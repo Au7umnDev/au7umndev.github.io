@@ -31,6 +31,9 @@ function RingCard({ ring }: Props) {
                         {ring.imageSrc.map((src, index) => (
                             <div key={index}>
                                 <img src={src} alt={`Image ${index + 1}`} style={{ width: 'auto', height: 'auto', borderRadius: 'lg' }} />
+                                 {ring.modelPath != '' && (
+                                 <div style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'rgba(128,0,128,0.8)', color: '#fff', padding: '5px', borderRadius: '5px', fontSize: '14px' }}>&nbsp;Примерка&nbsp;</div>
+                                 )}
                             </div>
                         ))}
                     </Carousel>

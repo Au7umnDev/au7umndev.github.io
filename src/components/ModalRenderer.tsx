@@ -35,13 +35,6 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(false);
     const connectorsCheckboxRef = useRef<HTMLInputElement>(null);
     const landmarksCheckboxRef = useRef<HTMLInputElement>(null);
-    // const modelMovementCheckboxRef = useRef<HTMLInputElement>(null);
-    // const [modelMovementCheckbox, setModelMovementCheckbox] = useState<boolean>(false);
-    // const ringSizeSliderRef = useRef<HTMLInputElement>(null);
-    // const cameraXpositionSliderRef = useRef<HTMLInputElement>(null);
-    // const cameraYpositionSliderRef = useRef<HTMLInputElement>(null);
-    // const cameraZpositionSliderRef = useRef<HTMLInputElement>(null);
-    // const ringZpositionSliderRef = useRef<HTMLInputElement>(null);
 
     const [handLandmarker, setHandLandmarker] = useState<HandLandmarker | null>(null);
     const [webcamRunning, setWebcamRunning] = useState<boolean>(false);
@@ -49,13 +42,6 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     const [model, setModel] = useAtom(ringModelAtom);
     const [showInstruction, setShowInstruction] = useState(true);
     const [showImage, setShowImage] = useState(true);
-    // const [ringZPosition, setRingZPosition] = useState<number>(-1);
-    // const [cameraXPosition, setCameraXPosition] = useState<number>(0);
-    // const [cameraYPosition, setCameraYPosition] = useState<number>(0);
-    // const [cameraZPosition, setCameraZPosition] = useState<number>(3);
-    // const [position14, setPosition14] = useState<any>({});
-    // const [position13, setPosition13] = useState<any>({});
-    // const [positionRingState, setPositionRingState] = useState<any>({});
 
     const createHandLandmarker = async () => {
         const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm");
@@ -136,8 +122,17 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
             return;
         }
 
-        canvasElement.width = videoRef.current?.videoWidth || 0;
-        canvasElement.height = videoRef.current?.videoHeight || 0;
+        // video.width = videoRef.current?.videoWidth || 0;
+        // video.height = videoRef.current?.videoHeight || 0;
+
+        // console.log('video width: ' + videoRef.current?.offsetWidth + '. Real video width: ' + videoRef.current?.videoWidth);
+        // console.log('video height: ' + videoRef.current?.offsetHeight + '. Real video height: ' + videoRef.current?.videoHeight);
+
+        // videoRef.current.style.width = videoRef.current?.videoWidth + 'px';
+        // videoRef.current.style.height = videoRef.current?.videoHeight + 'px';
+
+        canvasElement.width = videoRef.current?.offsetWidth || 0;
+        canvasElement.height = videoRef.current?.offsetHeight || 0;
         canvasElement.style.left = `${videoRef.current?.offsetLeft}px`;
         canvasElement.style.top = `${videoRef.current?.offsetTop}px`;
 
@@ -300,57 +295,6 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     }, [])
 
     useEffect(() => {
-        // const scene = new THREE.Scene();
-        // const renderer = new THREE.WebGLRenderer({ alpha: true });
-        // let camera = undefined;
-
-        // if (canvasRef.current) {
-        //     renderer.setSize(canvasRef.current.width, canvasRef.current.height);
-        //     renderer.domElement.style.position = "absolute";
-        //     renderer.domElement.style.top = "0";
-        //     renderer.domElement.style.left = "0";
-        //     renderer.physicallyCorrectLights = true;
-        //     renderer.outputEncoding = THREE.sRGBEncoding;
-
-        //     document.getElementById("overlay")?.appendChild(renderer.domElement);
-
-        //     const ambientLight = new THREE.AmbientLight(0xFFFFFF);
-        //     ambientLight.intensity = 2;
-        //     scene.add(ambientLight);
-
-        //     camera = new THREE.PerspectiveCamera(75, canvasRef.current.width / canvasRef.current.height, 0.1, 1000);
-        //     camera.position.z = 5;
-
-        //     const loader = new GLTFLoader();
-        //     loader.load(
-        //         'app/models/ring_black_and_red.glb',
-        //         function(gltf) {
-        //             const loadedModel = gltf.scene;
-        //             loadedModel.scale.set(0.01, 0.01, 0.01);
-        //             scene.add(loadedModel);
-        //             setModel(loadedModel);
-        //         },
-        //         undefined,
-        //         function(error) {
-        //             console.error('An error happened', error);
-        //         }
-        //     );
-
-        //     const animate = () => {
-        //         requestAnimationFrame(animate);
-        //         renderer.render(scene, camera);
-        //     };
-        //     animate();
-        // }
-
-        // return () => {
-        //     if (renderer.domElement) {
-        //         renderer.domElement.remove();
-        //     }
-        // };
-    }, [canvasRef.current]);
-
-    useEffect(() => {
         if (!modelAdded) {
             if (model) {
                 model.scale.set(0, 0, 0);
@@ -358,20 +302,6 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
             }
         }
     }, [modelAdded]);
-
-    // useEffect(() => {
-    //     if (cameraRef.current) {
-    //         cameraRef.current.position.x = cameraXPosition;
-    //         cameraRef.current.position.y = cameraYPosition;
-    //         cameraRef.current.position.z = cameraZPosition;
-    //     }
-    // }, [cameraZPosition, cameraYPosition, cameraXPosition]);
-
-    // useEffect(() => {
-    //     if (ringPosRef.current) {
-    //         ringPosRef.current.z = ringZPosition;
-    //     }
-    // }, [ringZPosition]);
 
     return (
         <Modal isOpen={isOpen} onClose={handleCloseModal} size='full'>
@@ -383,7 +313,9 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                     <Tabs variant='soft-rounded' colorScheme='purple'>
                         <TabList>
                             <Tab>Описание</Tab>
+                            {ring.modelPath != '' && (
                             <Tab>Примерка</Tab>
+                            )}
                         </TabList>
                         <TabPanels>
                             <TabPanel>
@@ -394,9 +326,11 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                         </div>
                                     ))}
                                 </Carousel>
+                                {ring.modelPath != '' && (
                                 <Flex justify='center' align='center' p={4} bg='purple.100' color='purple.800' borderRadius='md' fontWeight='bold' mt={4}>
                                 Это кольцо можно примерить с помощью дополненной реальности! Перейдите во вкладку "Примерка".
                                 </Flex>
+                                )}
                                 <Text mt="10px" fontSize="lg" textAlign="justify" fontStyle="italic" color="gray.900">
                                     {ring.totalDescription}
                                 </Text>
@@ -408,9 +342,9 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                             {showImage && (
                                             <Image src={'/src/img/no_camera.jpg'} alt="Waiting for camera..." style={{ position: 'absolute', width: '640px', height: '480px', zIndex: 99995 }}/>
                                             )}
-                                            <video ref={videoRef} autoPlay muted style={{ width: '640px', height: '480px' }} />
+                                            <video ref={videoRef} autoPlay muted style={{ pointerEvents: 'none', width: '640px', height: '480px' }} />
                                             <canvas ref={canvasRef} style={{ pointerEvents: 'none', position: 'absolute', left: '0px', top: '0px', zIndex: 99998 }}></canvas>
-                                            <div ref={overlayRef} style={{ position: 'absolute', left: '0px', top: '0px', zIndex: 99999 }}></div>
+                                            <div ref={overlayRef} style={{ pointerEvents: 'none', position: 'absolute', left: '0px', top: '0px', zIndex: 99999 }}></div>
                                         </Flex>
                                         <FormControl>
                                             <FormLabel>Настройки</FormLabel>
@@ -420,60 +354,6 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                                 {/* <Checkbox ref={modelMovementCheckboxRef} isChecked={modelMovementCheckbox} onChange={() => setModelMovementCheckbox(prev => !prev)}>Заморозить движение кольца по Y координатам</Checkbox> */}
                                             </Stack>
                                         </FormControl>
-                                        {/* <FormControl>
-                                            <FormLabel>Настройка размера кольца</FormLabel>
-                                            <Slider aria-label='slider-ex-1' defaultValue={30} w='25%' ref={ringSizeSliderRef}>
-                                                <SliderTrack>
-                                                    <SliderFilledTrack />
-                                                </SliderTrack>
-                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
-                                            </Slider>
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel>Изменить положение кольца по Y координатам</FormLabel>
-                                            <Slider aria-label='slider-ex-1' defaultValue={30} w='25%'>
-                                                <SliderTrack>
-                                                    <SliderFilledTrack />
-                                                </SliderTrack>
-                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
-                                            </Slider>
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel>Изменить положение кольца по Z координатам: {ringZPosition}</FormLabel>
-                                            <Slider aria-label='slider-ex-1' defaultValue={-1} min={-10} max={10} step={0.5} w='25%' ref={ringZpositionSliderRef} onChange={(value) => {setRingZPosition(value);}}>
-                                                <SliderTrack>
-                                                    <SliderFilledTrack />
-                                                </SliderTrack>
-                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
-                                            </Slider>
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel>Изменить положение камеры по X координатам: {cameraXPosition}</FormLabel>
-                                            <Slider aria-label='slider-ex-1' defaultValue={0} min={-1} max={1} step={0.1} w='25%' ref={cameraXpositionSliderRef} onChange={(value) => {setCameraXPosition(value);}}>
-                                                <SliderTrack>
-                                                    <SliderFilledTrack />
-                                                </SliderTrack>
-                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
-                                            </Slider>
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel>Изменить положение камеры по Y координатам: {cameraYPosition}</FormLabel>
-                                            <Slider aria-label='slider-ex-1' defaultValue={0} min={-1} max={1} step={0.1} w='25%' ref={cameraYpositionSliderRef} onChange={(value) => {setCameraYPosition(value);}}>
-                                                <SliderTrack>
-                                                    <SliderFilledTrack />
-                                                </SliderTrack>
-                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
-                                            </Slider>
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel>Изменить положение камеры по Z координатам: {cameraZPosition}</FormLabel>
-                                            <Slider aria-label='slider-ex-1' defaultValue={3} min={-10} max={10} step={0.5} w='25%' ref={cameraZpositionSliderRef} onChange={(value) => {setCameraZPosition(value);}}>
-                                                <SliderTrack>
-                                                    <SliderFilledTrack />
-                                                </SliderTrack>
-                                                <SliderThumb bg='red' _active={{ 'bgColor': "yellow" }} />
-                                            </Slider>
-                                        </FormControl> */}
                                         <Button onClick={enableWebcam}>Примерить</Button>
                                         { showInstruction && (
                                         <Flex justify='center' align='center' p={4} bg='purple.100' color='purple.800' borderRadius='md' fontWeight='bold' mt={4}>
