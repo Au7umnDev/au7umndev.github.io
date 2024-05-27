@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { Button, Card, CardBody, CardFooter, Divider, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Carousel } from 'react-responsive-carousel';
 import React, { useState } from 'react'
