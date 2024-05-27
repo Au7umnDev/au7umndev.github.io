@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import { Flex, Spacer } from '@chakra-ui/react'
 import Footer from './components/Footer'
 import RingsGrid from './components/RingsGrid'

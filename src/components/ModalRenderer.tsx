@@ -59,7 +59,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
 
     const addModel = () => {
         const scene = new THREE.Scene();
-        const renderer = new THREE.WebGLRenderer({ alpha: true }); // Добавил атрибут alpha для поддержки прозрачности
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
         const camera = new THREE.PerspectiveCamera(20, 640 / 480, 0.1, 1000); // Инициализация объекта camera
         camera.position.z = 3;
         cameraRef.current = camera;
@@ -72,7 +72,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         renderer.domElement.style.left = `${videoRef.current?.offsetLeft}px`;
         renderer.domElement.width = 640;
         renderer.domElement.height = 480;
-        renderer.outputColorSpace = THREE.SRGBColorSpace; // Добавил атрибут для корректного отображения цветов
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
 
         overlayRef.current!.appendChild(renderer.domElement);
 
@@ -259,7 +259,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
         if (videoRef.current) {
             const tracks = streamRef.current.getTracks();
             // console.log(tracks);
-            tracks.forEach(track => track.stop());
+            tracks.forEach((track: { stop: () => any; }) => track.stop());
             videoRef.current.srcObject = null;
             setWebcamRunning(false);
         }

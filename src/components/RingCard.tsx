@@ -1,6 +1,5 @@
 import { Button, Card, CardBody, CardFooter, Divider, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Carousel } from 'react-responsive-carousel';
-import React, { useState } from 'react'
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import ModalRenderer from './ModalRenderer'
 
@@ -9,7 +8,8 @@ type Ring = {
     name: string,
     imageSrc: string[],
     modelPath: string,
-    description: string
+    description: string,
+    totalDescription: string
 }
 
 type Props = {
@@ -18,9 +18,7 @@ type Props = {
 
 function RingCard({ ring }: Props) {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [modalType, setModalType] = useState("");
     const openModal = () => {
-        setModalType('')
         onOpen()
       }
     return (
