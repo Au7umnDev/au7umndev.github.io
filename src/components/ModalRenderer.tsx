@@ -1,5 +1,5 @@
-import { Text, Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, HStack, FormControl, FormHelperText, FormLabel, Input, Checkbox, Stack, Hide, Slider, SliderFilledTrack, SliderThumb, SliderTrack, Box } from '@chakra-ui/react'
-import React, { useEffect, useRef, useState } from 'react'
+import { Text, Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, FormControl, FormLabel, Checkbox, Stack } from '@chakra-ui/react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three';
 import { Carousel } from 'react-responsive-carousel';
 import { HandLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";

@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Card, CardBody, CardFooter, CardHeader, Divider, Heading, Image, Stack, Text, useDisclosure } from '@chakra-ui/react'
+import { Button, Card, CardBody, CardFooter, Divider, Heading, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import { Carousel } from 'react-responsive-carousel';
 import React, { useState } from 'react'
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
