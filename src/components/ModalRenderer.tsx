@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { Text, Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, FormControl, FormLabel, Checkbox, Stack } from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three';
