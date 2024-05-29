@@ -6,19 +6,19 @@ const ringsRepository = [
         name: 'Кольцо чёрно-красное',
         imageSrc: [
             'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/Ring_black_and_red_1.jpg?raw=true',
-            './src/img/Ring_black_and_red_2.jpg',
-            './src/img/Ring_black_and_red_3.jpg'
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/Ring_black_and_red_2.jpg?raw=true',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/Ring_black_and_red_3.jpg?raw=true'
         ],
-        modelPath: './src/models/ring_black_and_red.glb',
+        modelPath: 'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/models/simple_ring.glb',
         description: 'Металл: титан. Масса: 15 г',
         totalDescription: 'Привлекательное черное кольцо с тонкой красной линией, расположенной элегантно посередине, воплощает собой смелость и стиль. Его современный дизайн без излишеств создает впечатление тонкого вкуса и изысканности. Это утонченное украшение идеально подходит как для повседневного использования, так и для особых случаев, добавляя образу загадочности и утонченности. Глянцевое покрытие придает кольцу блеск и уникальность, привлекая внимание к его изысканной простоте. Создайте свой неповторимый стиль с этим изысканным аксессуаром, который подчеркнет вашу индивидуальность и выразит вашу уверенность в себе и свой вкус.'
     },
     {
         name: 'Кольцо золотое с гравировкой',
         imageSrc: [
-            './src/img/ring_of_noobs_1.jpg',    
-            './src/img/ring_of_noobs_2.jpg',
-            './src/img/ring_of_noobs_3.jpg'
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/ring_of_noobs_1.jpg?raw=true',    
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/ring_of_noobs_2.jpg?raw=true',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/ring_of_noobs_3.jpg?raw=true'
         ],
         modelPath: '',
         description: 'Металл: золото. Масса: 23 г',
@@ -27,9 +27,9 @@ const ringsRepository = [
     {
         name: 'Кольцо серебряное «Галадриэль»',
         imageSrc: [
-            './src/img/nenia_ring_1.jpg',
-            './src/img/nenia_ring_2.jpg',
-            './src/img/nenia_ring_3.jpg'
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/nenia_ring_1.jpg?raw=true',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/nenia_ring_2.jpg?raw=true',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/nenia_ring_3.jpg?raw=true'
         ],
         modelPath: '',
         description: 'Металл: серебро. Масса: 35 г',
@@ -38,9 +38,9 @@ const ringsRepository = [
     {
         name: 'Кольцо золотое с бриллиантом',
         imageSrc: [
-            './src/img/the_ring_1_carat_1.jpg',
-            './src/img/the_ring_1_carat_2.jpg',
-            './src/img/the_ring_1_carat_3.jpg'
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/the_ring_1_carat_1.jpg?raw=true',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/the_ring_1_carat_2.jpg?raw=true',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/the_ring_1_carat_3.jpg?raw=true'
         ],
         modelPath: '',
         description: 'Металл: золото. Масса: 20 г',
@@ -49,9 +49,9 @@ const ringsRepository = [
     {
         name: 'Кольцо старинное инкрустированное',
         imageSrc: [
-            './src/img/iron_ring_1.jpg',
-            './src/img/iron_ring_2.jpg',
-            './src/img/iron_ring_3.jpg'
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/iron_ring_1.jpg?raw=true',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/iron_ring_2.jpg?raw=true',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/iron_ring_3.jpg?raw=true'
         ],
         modelPath: '',
         description: 'Металл: ювелирная сталь. Масса: 41 г',
