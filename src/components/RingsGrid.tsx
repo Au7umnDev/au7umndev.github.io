@@ -5,7 +5,7 @@ const ringsRepository = [
     {
         name: 'Кольцо чёрно-красное',
         imageSrc: [
-            'https://img.freepik.com/free-photo/fresh-yellow-daisy-single-flower-close-up-beauty-generated-by-ai_188544-15543.jpg?size=626&ext=jpg&ga=GA1.1.44546679.1716681600&semt=ais_user',
+            'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/Ring_black_and_red_1.jpg?raw=true',
             './src/img/Ring_black_and_red_2.jpg',
             './src/img/Ring_black_and_red_3.jpg'
         ],
