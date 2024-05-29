@@ -340,7 +340,7 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                     <Flex gap={2} direction='column'>
                                         <Flex direction='column' alignItems='center'>
                                             {showImage && (
-                                            <Image src={'/src/img/no_camera.jpg'} alt="Waiting for camera..." style={{ position: 'absolute', width: '640px', height: '480px', zIndex: 99995 }}/>
+                                            <Image src={'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/no_camera.jpg'} alt="Waiting for camera..." style={{ position: 'absolute', width: '640px', height: '480px', zIndex: 99995 }}/>
                                             )}
                                             <video ref={videoRef} autoPlay muted style={{ pointerEvents: 'none', width: '640px', height: '480px' }} />
                                             <canvas ref={canvasRef} style={{ pointerEvents: 'none', position: 'absolute', left: '0px', top: '0px', zIndex: 99998 }}></canvas>
