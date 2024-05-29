@@ -5,7 +5,7 @@ const ringsRepository = [
     {
         name: 'Кольцо чёрно-красное',
         imageSrc: [
-            '/src/img/Ring_black_and_red_1.jpg',
+            '/img/Ring_black_and_red_1.jpg',
             'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/Ring_black_and_red_2.jpg?raw=true',
             'https://github.com/Au7umnDev/au7umndev.github.io/blob/main/src/img/Ring_black_and_red_3.jpg?raw=true'
         ],
