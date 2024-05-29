@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three';
 import { Carousel } from 'react-responsive-carousel';
 import { HandLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
-import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
+// import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
+import { drawConnectors, drawLandmarks } from 'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.10.0';
 import { HAND_CONNECTIONS } from '@mediapipe/holistic';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { ringModelAtom } from '../atomStorage';
