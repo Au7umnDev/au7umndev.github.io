@@ -1,4 +1,4 @@
-import { Text, Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, FormControl, FormLabel, Stack } from '@chakra-ui/react'
+import { Text, Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex } from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three';
 import { Carousel } from 'react-responsive-carousel';
@@ -346,14 +346,14 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                             <canvas ref={canvasRef} style={{ pointerEvents: 'none', position: 'absolute', left: '0px', top: '0px', zIndex: 99998 }}></canvas>
                                             <div ref={overlayRef} style={{ pointerEvents: 'none', position: 'absolute', left: '0px', top: '0px', zIndex: 99999 }}></div>
                                         </Flex>
-                                        <FormControl>
+                                        {/*<FormControl>
                                             <FormLabel>Настройки</FormLabel>
                                             <Stack>
-                                                {/*<Checkbox ref={landmarksCheckboxRef} isChecked={landmarksCheckbox} onChange={() => setLandmarksCheckbox(prev => !prev)}>Рисовать распознаваемые узлы</Checkbox>
-                                                <Checkbox ref={connectorsCheckboxRef} isChecked={connectorsCheckbox} onChange={() => setConnectorsCheckbox(prev => !prev)}>Рисовать связи между узлами</Checkbox>*/}
-                                                {/* <Checkbox ref={modelMovementCheckboxRef} isChecked={modelMovementCheckbox} onChange={() => setModelMovementCheckbox(prev => !prev)}>Заморозить движение кольца по Y координатам</Checkbox> */}
+                                                <Checkbox ref={landmarksCheckboxRef} isChecked={landmarksCheckbox} onChange={() => setLandmarksCheckbox(prev => !prev)}>Рисовать распознаваемые узлы</Checkbox>
+                                                <Checkbox ref={connectorsCheckboxRef} isChecked={connectorsCheckbox} onChange={() => setConnectorsCheckbox(prev => !prev)}>Рисовать связи между узлами</Checkbox>
+                                                <Checkbox ref={modelMovementCheckboxRef} isChecked={modelMovementCheckbox} onChange={() => setModelMovementCheckbox(prev => !prev)}>Заморозить движение кольца по Y координатам</Checkbox>
                                             </Stack>
-                                        </FormControl>
+                                        </FormControl> */}
                                         <Button onClick={enableWebcam}>Примерить</Button>
                                         { showInstruction && (
                                         <Flex justify='center' align='center' p={4} bg='purple.100' color='purple.800' borderRadius='md' fontWeight='bold' mt={4}>
