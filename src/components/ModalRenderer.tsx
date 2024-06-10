@@ -1,10 +1,10 @@
-import { Text, Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, FormControl, FormLabel, Checkbox, Stack } from '@chakra-ui/react'
+import { Text, Modal, Image, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Button, ModalFooter, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, FormControl, FormLabel, Stack } from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three';
 import { Carousel } from 'react-responsive-carousel';
 import { HandLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
-import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
-import { HAND_CONNECTIONS } from '@mediapipe/holistic';
+// import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
+// import { HAND_CONNECTIONS } from '@mediapipe/holistic';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { ringModelAtom } from '../atomStorage';
 import { useAtom } from 'jotai';
@@ -31,10 +31,10 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
     const cameraRef = useRef<any>(null);
     const ringPosRef = useRef<any>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
-    const [connectorsCheckbox, setConnectorsCheckbox] = useState<boolean>(false);
-    const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(false);
-    const connectorsCheckboxRef = useRef<HTMLInputElement>(null);
-    const landmarksCheckboxRef = useRef<HTMLInputElement>(null);
+    // const [connectorsCheckbox, setConnectorsCheckbox] = useState<boolean>(false);
+    // const [landmarksCheckbox, setLandmarksCheckbox] = useState<boolean>(false);
+    // const connectorsCheckboxRef = useRef<HTMLInputElement>(null);
+    // const landmarksCheckboxRef = useRef<HTMLInputElement>(null);
 
     const [handLandmarker, setHandLandmarker] = useState<HandLandmarker | null>(null);
     const [webcamRunning, setWebcamRunning] = useState<boolean>(false);
@@ -155,18 +155,18 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                     return landmark;
                 })
 
-                if (connectorsCheckboxRef.current?.checked) {
-                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
-                        color: "#FFFFFF",
-                        lineWidth: 5
-                    });
-                }
-                if (landmarksCheckboxRef.current?.checked) {
-                    drawLandmarks(canvasCtx, landmarks, {
-                        color: "#00BFFF",
-                        lineWidth: 2
-                    });
-                }
+                // if (connectorsCheckboxRef.current?.checked) {
+                //     drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+                //         color: "#FFFFFF",
+                //         lineWidth: 5
+                //     });
+                // }
+                // if (landmarksCheckboxRef.current?.checked) {
+                //     drawLandmarks(canvasCtx, landmarks, {
+                //         color: "#00BFFF",
+                //         lineWidth: 2
+                //     });
+                // }
             }
 
             if (results.landmarks.length !== 0) {
@@ -349,8 +349,8 @@ function ActionModal({ isOpen, onClose, ring }: Props) {
                                         <FormControl>
                                             <FormLabel>Настройки</FormLabel>
                                             <Stack>
-                                                <Checkbox ref={landmarksCheckboxRef} isChecked={landmarksCheckbox} onChange={() => setLandmarksCheckbox(prev => !prev)}>Рисовать распознаваемые узлы</Checkbox>
-                                                <Checkbox ref={connectorsCheckboxRef} isChecked={connectorsCheckbox} onChange={() => setConnectorsCheckbox(prev => !prev)}>Рисовать связи между узлами</Checkbox>
+                                                {/*<Checkbox ref={landmarksCheckboxRef} isChecked={landmarksCheckbox} onChange={() => setLandmarksCheckbox(prev => !prev)}>Рисовать распознаваемые узлы</Checkbox>
+                                                <Checkbox ref={connectorsCheckboxRef} isChecked={connectorsCheckbox} onChange={() => setConnectorsCheckbox(prev => !prev)}>Рисовать связи между узлами</Checkbox>*/}
                                                 {/* <Checkbox ref={modelMovementCheckboxRef} isChecked={modelMovementCheckbox} onChange={() => setModelMovementCheckbox(prev => !prev)}>Заморозить движение кольца по Y координатам</Checkbox> */}
                                             </Stack>
                                         </FormControl>
